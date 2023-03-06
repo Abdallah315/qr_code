@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/utils/colors.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
+import 'package:provider/provider.dart';
+
+import '../../data/business_logic/auth.dart';
 
 enum AuthMode { SignUp, Login }
 
@@ -15,13 +18,17 @@ class _AuthScreenState extends State<AuthScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController rePasswordController = TextEditingController();
   AuthMode _authMode = AuthMode.SignUp;
+  final GlobalKey<FormState> _formkey = GlobalKey();
   final Map<String, dynamic> _authData = {
     'name': '',
     'email': '',
     'password': '',
+    're-password': '',
   };
   bool showPass = false;
+  bool isLoading = false;
 
   String dropdownvalue = 'Student';
 
@@ -40,11 +47,11 @@ class _AuthScreenState extends State<AuthScreen> {
         child: SingleChildScrollView(
           child: Column(children: [
             SizedBox(
-              height: getHeight(context) * .2,
+              height: getHeight(context) * .1,
             ),
             Container(
               width: getWidth(context),
-              height: getHeight(context) * .8,
+              height: getHeight(context) * .9,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(29),
@@ -73,7 +80,11 @@ class _AuthScreenState extends State<AuthScreen> {
                   SizedBox(
                     height: getHeight(context) * .05,
                   ),
-                  buildFormButton(context),
+                  isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        )
+                      : buildFormButton(context),
                   SizedBox(
                     height: getHeight(context) * .02,
                   ),
@@ -91,149 +102,189 @@ class _AuthScreenState extends State<AuthScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Form(
+          key: _formkey,
           child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_authMode == AuthMode.SignUp)
-            Text(
-              "Name",
-              style: TextStyle(
-                fontSize: 12,
-                color: MyColors.myWhite,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          if (_authMode == AuthMode.SignUp)
-            const SizedBox(
-              height: 5,
-            ),
-          if (_authMode == AuthMode.SignUp)
-            TextForm(
-              controller: nameController,
-              obscure: false,
-              hintText: 'Jiara Martin',
-              validator: (val) {
-                if (val!.isEmpty) {
-                  return 'This field can\'t be empty';
-                }
-                return null;
-              },
-              onSaved: (val) {
-                _authData['name'] = val!;
-              },
-            ),
-          const SizedBox(
-            height: 25,
-          ),
-          Text(
-            "Email",
-            style: TextStyle(
-              fontSize: 12,
-              color: MyColors.myWhite,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          TextForm(
-              controller: emailController,
-              obscure: false,
-              hintText: 'jiara@martin.com',
-              validator: (val) {
-                if (!val!.contains('@') || val.isEmpty) {
-                  return 'please make sure you\'ve entered the right data';
-                }
-                return null;
-              },
-              onSaved: (val) {
-                _authData['email'] = val!;
-              }),
-          const SizedBox(
-            height: 25,
-          ),
-          Text(
-            "password",
-            style: TextStyle(
-              fontSize: 12,
-              color: MyColors.myWhite,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          TextForm(
-              controller: passwordController,
-              hintText: 'your password',
-              obscure: showPass == true ? false : true,
-              onTap: () {
-                setState(() {
-                  if (showPass == true) {
-                    showPass = false;
-                  } else {
-                    showPass = true;
-                  }
-                });
-              },
-              validator: (val) {
-                if (val!.isEmpty || val.length < 6) {
-                  return 'password must be 6 numbers or more';
-                }
-                return null;
-              },
-              onSaved: (val) {
-                _authData['password'] = val!;
-              }),
-          if (_authMode == AuthMode.SignUp)
-            const SizedBox(
-              height: 5,
-            ),
-          if (_authMode == AuthMode.SignUp)
-            Text(
-              "Role",
-              style: TextStyle(
-                fontSize: 12,
-                color: MyColors.myWhite,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          if (_authMode == AuthMode.SignUp)
-            const SizedBox(
-              height: 5,
-            ),
-          if (_authMode == AuthMode.SignUp)
-            Center(
-              child: Container(
-                width: getWidth(context) * .88,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10)),
-
-                // dropdown below..
-                child: DropdownButton<String>(
-                  value: dropdownvalue,
-                  onChanged: (String? newValue) {
-                    setState(() => dropdownvalue = newValue!);
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_authMode == AuthMode.SignUp)
+                Text(
+                  "Name",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: MyColors.myWhite,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              if (_authMode == AuthMode.SignUp)
+                const SizedBox(
+                  height: 5,
+                ),
+              if (_authMode == AuthMode.SignUp)
+                TextForm(
+                  controller: nameController,
+                  obscure: false,
+                  hintText: 'Jiara Martin',
+                  validator: (val) {
+                    if (val!.isEmpty) {
+                      return 'This field can\'t be empty';
+                    }
+                    return null;
                   },
-                  isExpanded: true,
-                  items: items
-                      .map<DropdownMenuItem<String>>(
-                          (String value) => DropdownMenuItem<String>(
-                                value: value,
-                                child: Center(child: Text(value)),
-                              ))
-                      .toList(),
-
-                  // add extra sugar..
-                  icon: const Icon(Icons.arrow_drop_down),
-                  iconSize: 42,
-                  underline: const SizedBox(),
+                  onSaved: (val) {
+                    _authData['name'] = val!;
+                  },
+                ),
+              const SizedBox(
+                height: 25,
+              ),
+              Text(
+                "Email",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: MyColors.myWhite,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-            ),
-        ],
-      )),
+              const SizedBox(
+                height: 5,
+              ),
+              TextForm(
+                  controller: emailController,
+                  obscure: false,
+                  hintText: 'jiara@martin.com',
+                  validator: (val) {
+                    if (!val!.contains('@') || val.isEmpty) {
+                      return 'please make sure you\'ve entered the right data';
+                    }
+                    return null;
+                  },
+                  onSaved: (val) {
+                    _authData['email'] = val!;
+                  }),
+              const SizedBox(
+                height: 25,
+              ),
+              Text(
+                "password",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: MyColors.myWhite,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              TextForm(
+                  controller: passwordController,
+                  hintText: 'your password',
+                  obscure: showPass == true ? false : true,
+                  onTap: () {
+                    setState(() {
+                      if (showPass == true) {
+                        showPass = false;
+                      } else {
+                        showPass = true;
+                      }
+                    });
+                  },
+                  validator: (val) {
+                    if (val!.isEmpty || val.length < 6) {
+                      return 'password must be 6 numbers or more';
+                    }
+                    return null;
+                  },
+                  onSaved: (val) {
+                    _authData['password'] = val!;
+                  }),
+              const SizedBox(
+                height: 25,
+              ),
+              if (_authMode == AuthMode.SignUp)
+                Text(
+                  "Repeat Password",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: MyColors.myWhite,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              if (_authMode == AuthMode.SignUp)
+                const SizedBox(
+                  height: 5,
+                ),
+              if (_authMode == AuthMode.SignUp)
+                TextForm(
+                    controller: rePasswordController,
+                    hintText: 'repeat your password',
+                    obscure: showPass == true ? false : true,
+                    onTap: () {
+                      setState(() {
+                        if (showPass == true) {
+                          showPass = false;
+                        } else {
+                          showPass = true;
+                        }
+                      });
+                    },
+                    validator: (val) {
+                      if (val!.isEmpty || _authData['password'] != val) {
+                        return 'password doesn\'t match';
+                      }
+                      return null;
+                    },
+                    onSaved: (val) {
+                      _authData['re-password'] = val!;
+                    }),
+              if (_authMode == AuthMode.SignUp)
+                const SizedBox(
+                  height: 5,
+                ),
+              if (_authMode == AuthMode.SignUp)
+                Text(
+                  "Role",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: MyColors.myWhite,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              if (_authMode == AuthMode.SignUp)
+                const SizedBox(
+                  height: 5,
+                ),
+              if (_authMode == AuthMode.SignUp)
+                Center(
+                  child: Container(
+                    width: getWidth(context) * .88,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+
+                    // dropdown below..
+                    child: DropdownButton<String>(
+                      value: dropdownvalue,
+                      onChanged: (String? newValue) {
+                        setState(() => dropdownvalue = newValue!);
+                      },
+                      isExpanded: true,
+                      items: items
+                          .map<DropdownMenuItem<String>>(
+                              (String value) => DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Center(child: Text(value)),
+                                  ))
+                          .toList(),
+
+                      // add extra sugar..
+                      icon: const Icon(Icons.arrow_drop_down),
+                      iconSize: 42,
+                      underline: const SizedBox(),
+                    ),
+                  ),
+                ),
+            ],
+          )),
     );
   }
 
@@ -241,18 +292,8 @@ class _AuthScreenState extends State<AuthScreen> {
     return Center(
       child: GestureDetector(
         onTap: () {
-          // ! part of form submit
-          // if (_authMode == AuthMode.SignUp) {
-          //   FirebaseAuth.instance.createUserWithEmailAndPassword(
-          //     email: _authData['email']!,
-          //     password: _authData['password']!,
-          //   );
-          // } else {
-          //   FirebaseAuth.instance.signInWithEmailAndPassword(
-          //     email: _authData['email']!,
-          //     password: _authData['password']!,
-          //   );
-          // }
+          _submit();
+          print(_authData);
         },
         child: Container(
           width: getWidth(context) * .85,
@@ -298,6 +339,7 @@ class _AuthScreenState extends State<AuthScreen> {
             nameController.clear();
             passwordController.clear();
             emailController.clear();
+            rePasswordController.clear();
             if (_authMode == AuthMode.SignUp) {
               setState(() {
                 _authMode = AuthMode.Login;
@@ -318,6 +360,38 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _submit() async {
+    _formkey.currentState!.save();
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      if (_authMode == AuthMode.Login) {
+        // Log user in
+        await Provider.of<Auth>(context, listen: false).login(
+          email: _authData['email'].toString(),
+          password: _authData['password'].toString(),
+        );
+      } else {
+        // Sign user up
+        await Provider.of<Auth>(context, listen: false).register(
+            context: context,
+            email: _authData['email'].toString(),
+            name: _authData['name'].toString(),
+            password: _authData['password'].toString(),
+            rePassword: _authData['re-password'].toString());
+      }
+    } catch (error) {
+      const errorMessage =
+          'Could not authenticate you. Please try again later.';
+      print('canot handle $error');
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 }
 

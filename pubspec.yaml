@@ -12,6 +12,7 @@ dependencies:
   shared_preferences:
   provider:
   http:
+  fluttertoast: ^8.2.1
   flutter_native_splash: ^2.2.18
 
 dev_dependencies:
