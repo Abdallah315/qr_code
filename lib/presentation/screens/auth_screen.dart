@@ -3,7 +3,7 @@ import 'package:flutter_qr_code/utils/colors.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/business_logic/auth.dart';
+import '../../data/store/auth.dart';
 
 enum AuthMode { SignUp, Login }
 
@@ -19,11 +19,13 @@ class _AuthScreenState extends State<AuthScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController rePasswordController = TextEditingController();
+  TextEditingController studentIdController = TextEditingController();
   AuthMode _authMode = AuthMode.SignUp;
   final GlobalKey<FormState> _formkey = GlobalKey();
   final Map<String, dynamic> _authData = {
     'name': '',
     'email': '',
+    'student-id': '',
     'password': '',
     're-password': '',
   };
@@ -76,7 +78,9 @@ class _AuthScreenState extends State<AuthScreen> {
                   SizedBox(
                     height: getHeight(context) * .02,
                   ),
-                  buildForm(),
+                  _authMode == AuthMode.SignUp
+                      ? buildSignUpForm()
+                      : buildLoginForm(),
                   SizedBox(
                     height: getHeight(context) * .05,
                   ),
@@ -89,6 +93,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: getHeight(context) * .02,
                   ),
                   switchAuthMode(),
+                  const SizedBox(
+                    height: 15,
+                  ),
                 ]),
               ),
             )
@@ -98,7 +105,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  buildForm() {
+  buildSignUpForm() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Form(
@@ -106,34 +113,31 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (_authMode == AuthMode.SignUp)
-                Text(
-                  "Name",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: MyColors.myWhite,
-                    fontWeight: FontWeight.w700,
-                  ),
+              Text(
+                "Name",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: MyColors.myWhite,
+                  fontWeight: FontWeight.w700,
                 ),
-              if (_authMode == AuthMode.SignUp)
-                const SizedBox(
-                  height: 5,
-                ),
-              if (_authMode == AuthMode.SignUp)
-                TextForm(
-                  controller: nameController,
-                  obscure: false,
-                  hintText: 'Jiara Martin',
-                  validator: (val) {
-                    if (val!.isEmpty) {
-                      return 'This field can\'t be empty';
-                    }
-                    return null;
-                  },
-                  onSaved: (val) {
-                    _authData['name'] = val!;
-                  },
-                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              TextForm(
+                controller: nameController,
+                obscure: false,
+                hintText: 'Jiara Martin',
+                validator: (val) {
+                  if (val!.isEmpty) {
+                    return 'This field can\'t be empty';
+                  }
+                  return null;
+                },
+                onSaved: (val) {
+                  _authData['name'] = val!;
+                },
+              ),
               const SizedBox(
                 height: 25,
               ),
@@ -200,89 +204,182 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(
                 height: 25,
               ),
-              if (_authMode == AuthMode.SignUp)
-                Text(
-                  "Repeat Password",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: MyColors.myWhite,
-                    fontWeight: FontWeight.w700,
-                  ),
+              Text(
+                "Repeat Password",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: MyColors.myWhite,
+                  fontWeight: FontWeight.w700,
                 ),
-              if (_authMode == AuthMode.SignUp)
-                const SizedBox(
-                  height: 5,
-                ),
-              if (_authMode == AuthMode.SignUp)
-                TextForm(
-                    controller: rePasswordController,
-                    hintText: 'repeat your password',
-                    obscure: showPass == true ? false : true,
-                    onTap: () {
-                      setState(() {
-                        if (showPass == true) {
-                          showPass = false;
-                        } else {
-                          showPass = true;
-                        }
-                      });
-                    },
-                    validator: (val) {
-                      if (val!.isEmpty || _authData['password'] != val) {
-                        return 'password doesn\'t match';
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              TextForm(
+                  controller: rePasswordController,
+                  hintText: 'repeat your password',
+                  obscure: showPass == true ? false : true,
+                  onTap: () {
+                    setState(() {
+                      if (showPass == true) {
+                        showPass = false;
+                      } else {
+                        showPass = true;
                       }
-                      return null;
+                    });
+                  },
+                  validator: (val) {
+                    if (val!.isEmpty || _authData['password'] != val) {
+                      return 'password doesn\'t match';
+                    }
+                    return null;
+                  },
+                  onSaved: (val) {
+                    _authData['re-password'] = val!;
+                  }),
+              const SizedBox(
+                height: 25,
+              ),
+              Text(
+                "Student ID",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: MyColors.myWhite,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              TextForm(
+                  controller: studentIdController,
+                  hintText: 'Your id',
+                  obscure: false,
+                  validator: (val) {
+                    if (val!.isEmpty) {
+                      return 'Enter your id';
+                    }
+                    return null;
+                  },
+                  onSaved: (val) {
+                    _authData['student-id'] = val!;
+                  }),
+              const SizedBox(
+                height: 25,
+              ),
+              Text(
+                "Role",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: MyColors.myWhite,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Center(
+                child: Container(
+                  width: getWidth(context) * .88,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10)),
+
+                  // dropdown below..
+                  child: DropdownButton<String>(
+                    value: dropdownvalue,
+                    onChanged: (String? newValue) {
+                      setState(() => dropdownvalue = newValue!);
                     },
-                    onSaved: (val) {
-                      _authData['re-password'] = val!;
-                    }),
-              if (_authMode == AuthMode.SignUp)
-                const SizedBox(
-                  height: 5,
-                ),
-              if (_authMode == AuthMode.SignUp)
-                Text(
-                  "Role",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: MyColors.myWhite,
-                    fontWeight: FontWeight.w700,
+                    isExpanded: true,
+                    items: items
+                        .map<DropdownMenuItem<String>>(
+                            (String value) => DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Center(child: Text(value)),
+                                ))
+                        .toList(),
+
+                    // add extra sugar..
+                    icon: const Icon(Icons.arrow_drop_down),
+                    iconSize: 42,
+                    underline: const SizedBox(),
                   ),
                 ),
-              if (_authMode == AuthMode.SignUp)
-                const SizedBox(
-                  height: 5,
-                ),
-              if (_authMode == AuthMode.SignUp)
-                Center(
-                  child: Container(
-                    width: getWidth(context) * .88,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
+              ),
+            ],
+          )),
+    );
+  }
 
-                    // dropdown below..
-                    child: DropdownButton<String>(
-                      value: dropdownvalue,
-                      onChanged: (String? newValue) {
-                        setState(() => dropdownvalue = newValue!);
-                      },
-                      isExpanded: true,
-                      items: items
-                          .map<DropdownMenuItem<String>>(
-                              (String value) => DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Center(child: Text(value)),
-                                  ))
-                          .toList(),
-
-                      // add extra sugar..
-                      icon: const Icon(Icons.arrow_drop_down),
-                      iconSize: 42,
-                      underline: const SizedBox(),
-                    ),
-                  ),
+  buildLoginForm() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Form(
+          key: _formkey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Email",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: MyColors.myWhite,
+                  fontWeight: FontWeight.w700,
                 ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              TextForm(
+                  controller: emailController,
+                  obscure: false,
+                  hintText: 'jiara@martin.com',
+                  validator: (val) {
+                    if (!val!.contains('@') || val.isEmpty) {
+                      return 'please make sure you\'ve entered the right data';
+                    }
+                    return null;
+                  },
+                  onSaved: (val) {
+                    _authData['email'] = val!;
+                  }),
+              const SizedBox(
+                height: 25,
+              ),
+              Text(
+                "password",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: MyColors.myWhite,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              TextForm(
+                  controller: passwordController,
+                  hintText: 'your password',
+                  obscure: showPass == true ? false : true,
+                  onTap: () {
+                    setState(() {
+                      if (showPass == true) {
+                        showPass = false;
+                      } else {
+                        showPass = true;
+                      }
+                    });
+                  },
+                  validator: (val) {
+                    if (val!.isEmpty || val.length < 6) {
+                      return 'password must be 6 numbers or more';
+                    }
+                    return null;
+                  },
+                  onSaved: (val) {
+                    _authData['password'] = val!;
+                  }),
             ],
           )),
     );
@@ -364,34 +461,38 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _submit() async {
     _formkey.currentState!.save();
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      if (_authMode == AuthMode.Login) {
-        // Log user in
-        await Provider.of<Auth>(context, listen: false).login(
-          email: _authData['email'].toString(),
-          password: _authData['password'].toString(),
-        );
-      } else {
-        // Sign user up
-        await Provider.of<Auth>(context, listen: false).register(
-            context: context,
+    if (_formkey.currentState!.validate()) {
+      setState(() {
+        isLoading = true;
+      });
+      try {
+        if (_authMode == AuthMode.Login) {
+          // Log user in
+          await Provider.of<Auth>(context, listen: false).login(
             email: _authData['email'].toString(),
-            name: _authData['name'].toString(),
             password: _authData['password'].toString(),
-            rePassword: _authData['re-password'].toString());
+          );
+        } else {
+          // Sign user up
+          await Provider.of<Auth>(context, listen: false).register(
+              context: context,
+              email: _authData['email'].toString(),
+              name: _authData['name'].toString(),
+              studentId: int.parse(_authData['student-id']),
+              userType: dropdownvalue.toLowerCase(),
+              password: _authData['password'].toString(),
+              rePassword: _authData['re-password'].toString());
+        }
+      } catch (error) {
+        const errorMessage =
+            'Could not authenticate you. Please try again later.';
+        print('canot handle $error');
       }
-    } catch (error) {
-      const errorMessage =
-          'Could not authenticate you. Please try again later.';
-      print('canot handle $error');
-    }
 
-    setState(() {
-      isLoading = false;
-    });
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }
 

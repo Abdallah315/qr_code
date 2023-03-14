@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_qr_code/presentation/screens/doctor/doctor_home_screen.dart';
 
-class PagesScreen extends StatefulWidget {
-  const PagesScreen({Key? key}) : super(key: key);
+class DoctorBottomNavBar extends StatefulWidget {
+  const DoctorBottomNavBar({Key? key}) : super(key: key);
 
   @override
-  State<PagesScreen> createState() => _PagesState();
+  State<DoctorBottomNavBar> createState() => _DoctorBottomNavBarState();
 }
 
-class _PagesState extends State<PagesScreen> {
+class _DoctorBottomNavBarState extends State<DoctorBottomNavBar> {
   int selectedIndex = 0;
   final List pages = [
-    // const HomeScreen(),
+    const DoctorHomeScreen(),
     // const RoomsScreen(),
     // const SettingsScreen()
   ];
@@ -34,18 +35,18 @@ class _PagesState extends State<PagesScreen> {
                   color: Colors.red,
                 ),
                 label: ''),
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.wysiwyg_sharp,
-                  color: Colors.cyan,
-                ),
-                label: ''),
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.workspaces,
-                  color: Colors.green,
-                ),
-                label: ''),
+            // BottomNavigationBarItem(
+            //     icon: Icon(
+            //       Icons.wysiwyg_sharp,
+            //       color: Colors.cyan,
+            //     ),
+            //     label: ''),
+            // BottomNavigationBarItem(
+            //     icon: Icon(
+            //       Icons.workspaces,
+            //       color: Colors.green,
+            //     ),
+            //     label: ''),
           ],
         ),
         body: pages[selectedIndex],

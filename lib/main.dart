@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_qr_code/presentation/screens/pages_screen.dart';
+import 'package:flutter_qr_code/data/store/course_store.dart';
+import 'package:flutter_qr_code/presentation/screens/doctor/doctor_bottom_nav_bar.dart';
+import 'package:flutter_qr_code/presentation/screens/student/student_home_screen.dart';
+import 'package:flutter_qr_code/presentation/screens/student/student_reports_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'data/business_logic/auth.dart';
+import 'data/store/auth.dart';
 import 'presentation/screens/auth_screen.dart';
 
 void main() {
@@ -16,29 +19,45 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(
-          value: Auth(),
-        ),
-      ],
-      child: Consumer<Auth>(
-        builder: (context, auth, _) => MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => Auth(),
           ),
-          home: auth.isAuth
-              ? const PagesScreen()
-              : FutureBuilder(
-                  future: auth.tryAutoLogin(),
-                  builder: (ctx, authResultSnapshot) => authResultSnapshot
-                              .connectionState ==
-                          ConnectionState.waiting
-                      ? const CircularProgressIndicator(color: Colors.purple)
-                      : const AuthScreen(),
-                ),
-        ),
-      ),
-    );
+          ChangeNotifierProvider(
+            create: (context) => CourseStore(),
+          )
+        ],
+        child: Consumer<Auth>(
+          builder: (context, auth, _) => MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: Builder(
+              builder: (context) {
+                if (auth.isAuth) {
+                  if (auth.userType == 'doctor') {
+                    return const DoctorBottomNavBar();
+                  } else {
+                    return const StudentHomeScreen();
+                  }
+                } else {
+                  return FutureBuilder(
+                    future: auth.tryAutoLogin(),
+                    builder: (ctx, authResultSnapshot) => authResultSnapshot
+                                .connectionState ==
+                            ConnectionState.waiting
+                        ? const CircularProgressIndicator(color: Colors.purple)
+                        : const AuthScreen(),
+                  );
+                }
+              },
+            ),
+            routes: {
+              StudentReportsScreen.routeName: (context) =>
+                  const StudentReportsScreen()
+            },
+          ),
+        ));
   }
 }

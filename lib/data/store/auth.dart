@@ -9,19 +9,31 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
-  String? _token;
+  String? _accessToken;
+  String? _refreshToken;
+  final String _userType = 'student';
 
   bool get isAuth {
-    return _token != null;
+    return _accessToken != null;
   }
 
-  String? get token {
-    return _token;
+  String? get accessToken {
+    return _accessToken;
+  }
+
+  String? get refreshToken {
+    return _refreshToken;
+  }
+
+  String? get userType {
+    return _userType;
   }
 
   Future<void> register(
       {required String name,
       required String email,
+      required int studentId,
+      required String userType,
       required String password,
       required String rePassword,
       required BuildContext context}) async {
@@ -36,9 +48,10 @@ class Auth with ChangeNotifier {
           },
           body: jsonEncode({
             'first_name': name,
-            'last_name': name,
             'username': name,
             'email': email,
+            'student_id': studentId,
+            'user_type': userType,
             'password': password,
             're_password': rePassword,
           }));
@@ -48,7 +61,7 @@ class Auth with ChangeNotifier {
 
       if (resposne.statusCode == 201) {
         Fluttertoast.showToast(
-            msg: "Activation token has been sent to your email",
+            msg: "Activation accessToken has been sent to your email",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
@@ -90,11 +103,14 @@ class Auth with ChangeNotifier {
             backgroundColor: Colors.green,
             textColor: Colors.white,
             fontSize: 16.0);
-        _token = responseData['access'];
+        // get userType;
+        _accessToken = responseData['access'];
+        _refreshToken = responseData['refresh'];
         notifyListeners();
-        print(_token);
+        print(_accessToken);
         final prefs = await SharedPreferences.getInstance();
-        final userData = json.encode({'token': _token});
+        final userData = json.encode(
+            {'accessToken': _accessToken, 'refreshToken': _refreshToken});
         prefs.setString('userData', userData);
       } else {
         print(responseData);
@@ -106,25 +122,37 @@ class Auth with ChangeNotifier {
 
   Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('userData') && token != null) {
+    if (!prefs.containsKey('userData') && accessToken != null) {
       return false;
     }
     final extractedData =
         json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
-    _token = extractedData['token'];
+    _accessToken = extractedData['accessToken'];
     notifyListeners();
     return true;
+  }
+
+  Future<String> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('userData') && accessToken != null) {
+      return "";
+    }
+    final extractedData =
+        json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
+    _accessToken = extractedData['accessToken'];
+    notifyListeners();
+    return extractedData['accessToken'];
   }
 
   Future<void> logout(BuildContext context) async {
     final url = Uri.parse('url/api/user/logout/');
     try {
       final response = await http.post(url, headers: {
-        // 'Authorization': 'token $token',
+        // 'Authorization': 'accessToken $accessToken',
         'connection': 'keep-alive'
       });
       if (response.statusCode == 200) {
-        _token = null;
+        _accessToken = null;
         notifyListeners();
         final prefs = await SharedPreferences.getInstance();
         prefs.clear();
