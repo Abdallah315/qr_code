@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_qr_code/presentation/screens/student/scan_qr_code_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_reports_screen.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
 
@@ -39,7 +40,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                   SizedBox(
                     height: getHeight(context) * .08,
                   ),
-                  Image.asset('assets/images/scanner.jpeg'),
+                  GestureDetector(
+                      onTap: () =>
+                          Navigator.of(context).pushNamed(ScanScreen.routeName),
+                      child: Image.asset('assets/images/scanner.jpeg')),
                   SizedBox(
                     height: getHeight(context) * 0.09,
                   ),

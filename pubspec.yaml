@@ -15,6 +15,8 @@ dependencies:
   fluttertoast: ^8.2.1
   flutter_native_splash: ^2.2.18
   persistent_bottom_nav_bar_v2:
+  flutter_barcode_scanner: ^2.0.0
+  barcode_widget: ^2.0.1
 
 dev_dependencies:
   flutter_test:

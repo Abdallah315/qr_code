@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/store/course_store.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/doctor_bottom_nav_bar.dart';
+import 'package:flutter_qr_code/presentation/screens/student/scan_qr_code_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_home_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_reports_screen.dart';
 import 'package:provider/provider.dart';
@@ -55,7 +56,8 @@ class MyApp extends StatelessWidget {
             ),
             routes: {
               StudentReportsScreen.routeName: (context) =>
-                  const StudentReportsScreen()
+                  const StudentReportsScreen(),
+              ScanScreen.routeName: (context) => const ScanScreen(),
             },
           ),
         ));
