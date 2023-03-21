@@ -13,8 +13,8 @@ class StudentReportsScreen extends StatefulWidget {
 }
 
 class _StudentReportsScreenState extends State<StudentReportsScreen> {
-  String dropdownvalue = '';
   bool _isLoading = false;
+  String dropdownvalue = '';
   var items;
 
   @override

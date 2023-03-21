@@ -72,6 +72,7 @@ class CourseStore with ChangeNotifier {
             (item) => AllCourses.fromJson(item),
           ),
         );
+        print('$_allCourses  store');
       } else {
         AppPopup.showMyDialog(context, response.body.toString());
       }
@@ -96,9 +97,10 @@ class CourseStore with ChangeNotifier {
         final responseData = json.decode(response.body);
         _allLectures = List<AllLectures>.from(
           responseData['results'].map(
-            (item) => AllCourses.fromJson(item),
+            (item) => AllLectures.fromJson(item),
           ),
         );
+        print('$_allLectures  store');
       } else {
         AppPopup.showMyDialog(context, response.body.toString());
       }

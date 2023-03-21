@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/store/course_store.dart';
+import 'package:flutter_qr_code/data/store/user_store.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/create_qr_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/doctor_courses_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/doctor_home_screen.dart';
@@ -28,6 +29,9 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider(
             create: (context) => CourseStore(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => UserStore(),
           )
         ],
         child: Consumer<Auth>(
