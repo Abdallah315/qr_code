@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Auth with ChangeNotifier {
   String? _accessToken;
   String? _refreshToken;
-  final String _userType = 'student';
+  final String _userType = 'doctor';
 
   bool get isAuth {
     return _accessToken != null;
@@ -61,7 +61,7 @@ class Auth with ChangeNotifier {
 
       if (resposne.statusCode == 201) {
         Fluttertoast.showToast(
-            msg: "Activation accessToken has been sent to your email",
+            msg: "Activation email has been sent",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
