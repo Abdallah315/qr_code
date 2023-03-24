@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/store/auth.dart';
 import 'package:flutter_qr_code/data/store/course_store.dart';
 import 'package:flutter_qr_code/data/store/user_store.dart';
+import 'package:flutter_qr_code/presentation/screens/doctor/create_qr_screen.dart';
+import 'package:flutter_qr_code/presentation/screens/loading_screen.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +20,8 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
   String coursesDropDown = '';
   String lecturesDropDown = '';
   String periodsDropDown = '1';
+  String? courseId;
+  String? lectureId;
   var lectures;
   List dummy = [];
   var courses;
@@ -35,13 +39,17 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
           .then((value) {
         lectures = Provider.of<CourseStore>(context, listen: false)
             .allLectures
-            .map((e) => e.description)
+            .map((e) => e.title)
             .toList();
         if (lectures.length == 0) {
           lecturesDropDown = 'no lectures';
           lectures = ['no lectures'];
         } else {
           lecturesDropDown = lectures[0];
+          lectureId = Provider.of<CourseStore>(context, listen: false)
+              .allLectures
+              .first
+              .id;
         }
       });
       Provider.of<CourseStore>(context, listen: false)
@@ -56,8 +64,12 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
           courses = ['no courses'];
         } else {
           coursesDropDown = courses[0];
+          courseId = Provider.of<CourseStore>(context, listen: false)
+              .allCourses
+              .first
+              .id;
         }
-
+      }).then((value) {
         setState(() {
           isLoading = false;
         });
@@ -92,11 +104,9 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
         Container(
           width: getWidth(context) * .8,
           height: getHeight(context),
-          padding: const EdgeInsets.only(left: 15),
+          padding: isLoading ? null : const EdgeInsets.only(left: 15),
           child: isLoading
-              ? const Center(
-                  child: CircularProgressIndicator.adaptive(),
-                )
+              ? const LoadingScreen()
               : Column(
                   children: [
                     const SizedBox(
@@ -133,6 +143,14 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
                                   value: coursesDropDown,
                                   onChanged: (String? newValue) {
                                     setState(() => coursesDropDown = newValue!);
+                                    courseId = Provider.of<CourseStore>(context,
+                                            listen: false)
+                                        .allCourses
+                                        .where((element) =>
+                                            element.description == newValue)
+                                        .toList()
+                                        .first
+                                        .id;
                                   },
                                   isExpanded: true,
 
@@ -181,6 +199,15 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
                                   onChanged: (String? newValue) {
                                     setState(
                                         () => lecturesDropDown = newValue!);
+                                    lectureId = Provider.of<CourseStore>(
+                                            context,
+                                            listen: false)
+                                        .allLectures
+                                        .where((element) =>
+                                            element.title == newValue)
+                                        .toList()
+                                        .first
+                                        .id;
                                   },
                                   isExpanded: true,
 
@@ -263,7 +290,31 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
                       height: 50,
                     ),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        // ! create attendance req
+                        var token =
+                            await Provider.of<Auth>(context, listen: false)
+                                .getToken();
+                        // ignore: use_build_context_synchronously
+                        String imagePath = await Provider.of<CourseStore>(
+                                context,
+                                listen: false)
+                            .createAttendanceRequest(context, token, courseId!,
+                                lectureId!, int.parse(periodsDropDown));
+                        if (imagePath != 'no image path') {
+                          if (context.mounted) {
+                            Navigator.of(context).pushNamed(
+                                CreateQrCodeScreen.routeName,
+                                arguments: {'imagePath': imagePath});
+                          }
+                        }
+                        setState(() {
+                          isLoading = false;
+                        });
+                      },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff161E4C),
                           fixedSize: Size(getWidth(context) * 0.6, 60)),

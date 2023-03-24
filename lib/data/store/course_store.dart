@@ -108,4 +108,37 @@ class CourseStore with ChangeNotifier {
       print('$e from getting all lectures');
     }
   }
+
+  Future<String> createAttendanceRequest(BuildContext context, String token,
+      String courseId, String lectureId, int period) async {
+    try {
+      Response response = await post(
+          Uri.parse(
+            'http://10.0.2.2:8000/api/v1/lectures/create/attendancerequest/',
+          ),
+          headers: {
+            "Connection": "keep-alive",
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Charset': 'utf-8',
+            'Authorization': 'JWT $token'
+          },
+          body: json.encode({
+            "lecture": lectureId,
+            "course": courseId,
+            "period": period,
+          }));
+      if (response.statusCode == 201) {
+        final responseData = json.decode(response.body);
+        String imagePath = responseData['cur_qrcode'][0]['qrcode'];
+        print('$imagePath  image path');
+        return imagePath;
+      } else {
+        AppPopup.showMyDialog(context, response.body.toString());
+        return 'no image path';
+      }
+    } catch (e) {
+      print('$e from creating attendance req');
+      return 'no image path';
+    }
+  }
 }

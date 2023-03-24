@@ -14,7 +14,6 @@ class _CreateQrCodeScreenState extends State<CreateQrCodeScreen> {
   Widget build(BuildContext context) {
     Map<String, dynamic> args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    print(args['course']);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xff161E4C),
@@ -24,12 +23,21 @@ class _CreateQrCodeScreenState extends State<CreateQrCodeScreen> {
       body: SizedBox(
         width: getWidth(context),
         height: getHeight(context),
-        child: Column(children: const [
-          SizedBox(
+        child: Column(children: [
+          const SizedBox(
             height: 20,
           ),
-          // Image.network('')
-          // Text(args['course'])
+          Image.network(
+            'http://10.0.2.2:8000${args['imagePath']}',
+            width: getWidth(context) * .85,
+            height: getHeight(context) * .6,
+            headers: const {
+              "Connection": "keep-alive",
+              'Content-Type': 'application/json;charset=UTF-8',
+              'Charset': 'utf-8',
+              // 'Authorization': 'JWT $token'
+            },
+          ),
         ]),
       ),
     );
