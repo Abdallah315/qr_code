@@ -16,7 +16,7 @@ class UserStore with ChangeNotifier {
     try {
       Response response = await get(
           Uri.parse(
-            'http://10.0.2.2:8000/api/v1/students-profiles/student_profile/student_profile/',
+            'http://134.122.64.234/api/v1/students-profiles/student_profile/student_profile/',
           ),
           headers: {
             "Connection": "keep-alive",

@@ -11,15 +11,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Auth with ChangeNotifier {
   String? _accessToken;
   String? _refreshToken;
-  final String _userType = 'doctor';
+  String? _userType;
 
   bool get isAuth {
     return _accessToken != null;
   }
 
-  String? get accessToken {
-    return _accessToken;
-  }
+  // String? get accessToken {
+  //   return _accessToken;
+  // }
 
   String? get refreshToken {
     return _refreshToken;
@@ -37,14 +37,13 @@ class Auth with ChangeNotifier {
       required String password,
       required String rePassword,
       required BuildContext context}) async {
-    final url = Uri.parse('http://10.0.2.2:8000/api/auth/users/');
+    final url = Uri.parse('http://134.122.64.234/api/v1/register/');
 
     try {
       final resposne = await http.post(url,
           headers: {
             "Connection": "keep-alive",
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Charset': 'utf-8'
+            'Content-Type': 'application/json',
           },
           body: jsonEncode({
             'first_name': name,
@@ -69,8 +68,8 @@ class Auth with ChangeNotifier {
             textColor: Colors.white,
             fontSize: 16.0);
       } else {
-        AppPopup.showMyDialog(context, responseData.toString());
         print('$responseData err');
+        AppPopup.showMyDialog(context, responseData.toString());
       }
     } catch (e) {
       AppPopup.showMyDialog(context, e.toString());
@@ -79,14 +78,13 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> login({required String email, required String password}) async {
-    final url = Uri.parse('http://10.0.2.2:8000/api/auth/jwt/create/');
+    final url = Uri.parse('http://134.122.64.234/users/auth/jwt/token/');
 
     try {
       final resposne = await http.post(url,
           headers: {
             "Connection": "keep-alive",
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Charset': 'utf-8'
+            'Content-Type': 'application/json',
           },
           body: jsonEncode({
             'email': email,
@@ -106,8 +104,9 @@ class Auth with ChangeNotifier {
         // get userType;
         _accessToken = responseData['access'];
         _refreshToken = responseData['refresh'];
+        _userType = responseData['type'];
+
         notifyListeners();
-        print(_accessToken);
         final prefs = await SharedPreferences.getInstance();
         final userData = json.encode(
             {'accessToken': _accessToken, 'refreshToken': _refreshToken});
@@ -122,7 +121,7 @@ class Auth with ChangeNotifier {
 
   Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('userData') && accessToken != null) {
+    if (!prefs.containsKey('userData') && _accessToken != null) {
       return false;
     }
     final extractedData =
@@ -134,7 +133,7 @@ class Auth with ChangeNotifier {
 
   Future<String> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('userData') && accessToken != null) {
+    if (!prefs.containsKey('userData') && _accessToken != null) {
       return "";
     }
     final extractedData =

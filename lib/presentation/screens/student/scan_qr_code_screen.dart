@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_qr_code/data/store/auth.dart';
+import 'package:flutter_qr_code/data/store/course_store.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 class ScanScreen extends StatefulWidget {
   static const routeName = '/scan-qr-code';
@@ -46,8 +49,13 @@ class _ScanScreenState extends State<ScanScreen> {
   Future<void> scanQr() async {
     try {
       FlutterBarcodeScanner.scanBarcode('#2A99CF', 'cancel', true, ScanMode.QR)
-          .then((value) {
+          .then((value) async {
         //! send the value to the backend
+        if (value != -1) {
+          String token = await Provider.of<Auth>(context).getToken();
+          Provider.of<CourseStore>(context, listen: false)
+              .createStudentAttendance(context, token, value);
+        }
         setState(() {
           qrstr = value;
         });

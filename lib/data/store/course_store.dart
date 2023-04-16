@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/models/all_courses.dart';
 import 'package:flutter_qr_code/data/models/all_lectures.dart';
+import 'package:flutter_qr_code/data/models/student_report.dart';
 import 'package:flutter_qr_code/presentation/widgets/app_popup.dart';
 import 'package:http/http.dart';
 
@@ -10,6 +11,7 @@ import '../models/course.dart';
 
 class CourseStore with ChangeNotifier {
   List<Course> _studentCourses = [];
+  StudentReport? _studentReport;
   List<AllCourses> _allCourses = [];
   List<AllLectures> _allLectures = [];
 
@@ -25,11 +27,15 @@ class CourseStore with ChangeNotifier {
     return _allLectures;
   }
 
+  StudentReport? get studentReport {
+    return _studentReport;
+  }
+
   Future<void> getStudentCourses(BuildContext context, String token) async {
     try {
       Response response = await get(
           Uri.parse(
-            'http://10.0.2.2:8000/api/v1/courses/current_student_courses/',
+            'http://134.122.64.234/api/v1/courses/current_student_courses/',
           ),
           headers: {
             "Connection": "keep-alive",
@@ -53,11 +59,59 @@ class CourseStore with ChangeNotifier {
     }
   }
 
+  Future<void> getStudentReport(
+      BuildContext context, String token, String id) async {
+    try {
+      Response response = await get(
+          Uri.parse(
+            'http://134.122.64.234/api/v1/students-profiles/attendance_report_by_course/$id/',
+          ),
+          headers: {
+            "Connection": "keep-alive",
+            'Content-Type': 'application/json',
+            'Authorization': 'JWT $token'
+          });
+      print(id);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        _studentReport = StudentReport.fromJson(responseData);
+      } else {
+        AppPopup.showMyDialog(context, response.body.toString());
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> createStudentAttendance(
+      BuildContext context, String token, String id) async {
+    try {
+      Response response = await get(
+          Uri.parse(
+            'http://134.122.64.234/api/v1/students-profiles/create_student_attendance/$id/',
+          ),
+          headers: {
+            "Connection": "keep-alive",
+            'Content-Type': 'application/json',
+            'Authorization': 'JWT $token'
+          });
+      print(id);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        _studentReport = StudentReport.fromJson(responseData);
+      } else {
+        AppPopup.showMyDialog(context, response.body.toString());
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<void> getAllCourses(BuildContext context, String token) async {
     try {
       Response response = await get(
           Uri.parse(
-            'http://10.0.2.2:8000/api/v1/courses/course/',
+            'http://134.122.64.234/api/v1/courses/course/',
           ),
           headers: {
             "Connection": "keep-alive",
@@ -85,7 +139,7 @@ class CourseStore with ChangeNotifier {
     try {
       Response response = await get(
           Uri.parse(
-            'http://10.0.2.2:8000/api/v1/lectures/all/',
+            'http://134.122.64.234/api/v1/lectures/all/',
           ),
           headers: {
             "Connection": "keep-alive",
@@ -114,7 +168,7 @@ class CourseStore with ChangeNotifier {
     try {
       Response response = await post(
           Uri.parse(
-            'http://10.0.2.2:8000/api/v1/lectures/create/attendancerequest/',
+            'http://134.122.64.234/api/v1/lectures/create/attendancerequest/',
           ),
           headers: {
             "Connection": "keep-alive",
