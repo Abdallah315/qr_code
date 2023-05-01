@@ -28,7 +28,7 @@ class UserStore with ChangeNotifier {
         final responseData = json.decode(response.body);
         _user = responseData['Student'];
       } else {
-        AppPopup.showMyDialog(context, response.body.toString());
+        AppPopup.showMyDialog(context, json.decode(response.body)['detail']);
       }
     } catch (e) {
       print('$e from getting all lectures');

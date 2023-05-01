@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/store/auth.dart';
 import 'package:flutter_qr_code/data/store/course_store.dart';
+import 'package:flutter_qr_code/data/store/user_store.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -41,7 +42,12 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
           course =
               Provider.of<CourseStore>(context, listen: false).studentCourses;
         }
-        print(items);
+        Provider.of<UserStore>(context, listen: false).getUser(context, token);
+        course?.forEach(
+          (e) {
+            print(e.id);
+          },
+        );
         setState(() {
           _isLoading = false;
         });
@@ -98,20 +104,27 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Row(
-                              children: const [
-                                Text(
+                              children: [
+                                const Text(
                                   'Student Name: ',
                                   style: TextStyle(
                                       color: Color(0xff5D6A7A),
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500),
                                 ),
-                                Text(
-                                  'name',
-                                  style: TextStyle(
-                                      color: Color(0xff5D6A7A),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
+                                Consumer<UserStore>(
+                                  builder: (context, userStore, child) {
+                                    return Text(
+                                      userStore.user['username'] == null ||
+                                              userStore.user['username'] == ''
+                                          ? ''
+                                          : userStore.user['username'],
+                                      style: const TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500),
+                                    );
+                                  },
                                 )
                               ],
                             ),
@@ -152,22 +165,25 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                               context,
                                               listen: false)
                                           .getToken();
-                                      course = course
-                                          ?.where(
-                                            (element) =>
-                                                element
-                                                    .courseInfo?.description ==
-                                                newValue,
-                                          )
-                                          .toList();
                                       setState(() {
                                         _isLoading = true;
                                       });
                                       // ignore: use_build_context_synchronously
                                       Provider.of<CourseStore>(context,
                                               listen: false)
-                                          .getStudentReport(context, token,
-                                              course!.first.id!);
+                                          .getStudentReport(
+                                              context,
+                                              token,
+                                              course!
+                                                  .where(
+                                                    (element) =>
+                                                        element.courseInfo!
+                                                            .description ==
+                                                        newValue,
+                                                  )
+                                                  .toList()
+                                                  .first
+                                                  .id!);
                                       setState(() {
                                         _isLoading = false;
                                       });

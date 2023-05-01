@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/models/all_courses.dart';
 import 'package:flutter_qr_code/data/models/all_lectures.dart';
 import 'package:flutter_qr_code/data/models/student_report.dart';
+import 'package:flutter_qr_code/data/store/auth.dart';
 import 'package:flutter_qr_code/presentation/widgets/app_popup.dart';
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 
 import '../models/course.dart';
 
@@ -51,8 +53,10 @@ class CourseStore with ChangeNotifier {
             (item) => Course.fromJson(item),
           ),
         );
+      } else if (response.statusCode == 401) {
+        Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
-        AppPopup.showMyDialog(context, response.body.toString());
+        AppPopup.showMyDialog(context, json.decode(response.body)['detail']);
       }
     } catch (e) {
       print(e);
@@ -71,19 +75,21 @@ class CourseStore with ChangeNotifier {
             'Content-Type': 'application/json',
             'Authorization': 'JWT $token'
           });
-      print(id);
+      print('$id from student report');
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         _studentReport = StudentReport.fromJson(responseData);
+      } else if (response.statusCode == 401) {
+        Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
-        AppPopup.showMyDialog(context, response.body.toString());
+        AppPopup.showMyDialog(context, json.decode(response.body)['detail']);
       }
     } catch (e) {
       print(e);
     }
   }
 
-  Future<void> createStudentAttendance(
+  Future<bool> createStudentAttendance(
       BuildContext context, String token, String id) async {
     try {
       Response response = await get(
@@ -97,13 +103,17 @@ class CourseStore with ChangeNotifier {
           });
       print(id);
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        _studentReport = StudentReport.fromJson(responseData);
+        return true;
+      } else if (response.statusCode == 401) {
+        Provider.of<Auth>(context, listen: false).refreshToken();
+        return false;
       } else {
-        AppPopup.showMyDialog(context, response.body.toString());
+        AppPopup.showMyDialog(context, json.decode(response.body)['detail']);
+        return false;
       }
     } catch (e) {
       print(e);
+      return false;
     }
   }
 
@@ -127,8 +137,10 @@ class CourseStore with ChangeNotifier {
           ),
         );
         print('$_allCourses  store');
+      } else if (response.statusCode == 401) {
+        Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
-        AppPopup.showMyDialog(context, response.body.toString());
+        AppPopup.showMyDialog(context, json.decode(response.body)['detail']);
       }
     } catch (e) {
       print('$e from getting all courses');
@@ -155,8 +167,10 @@ class CourseStore with ChangeNotifier {
           ),
         );
         print('$_allLectures  store');
+      } else if (response.statusCode == 401) {
+        Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
-        AppPopup.showMyDialog(context, response.body.toString());
+        AppPopup.showMyDialog(context, json.decode(response.body)['detail']);
       }
     } catch (e) {
       print('$e from getting all lectures');
@@ -186,8 +200,11 @@ class CourseStore with ChangeNotifier {
         String imagePath = responseData['cur_qrcode'][0]['qrcode'];
         print('$imagePath  image path');
         return imagePath;
+      } else if (response.statusCode == 401) {
+        Provider.of<Auth>(context, listen: false).refreshToken();
+        return 'no image path';
       } else {
-        AppPopup.showMyDialog(context, response.body.toString());
+        AppPopup.showMyDialog(context, json.decode(response.body)['detail']);
         return 'no image path';
       }
     } catch (e) {

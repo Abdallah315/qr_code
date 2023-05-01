@@ -21,10 +21,6 @@ class Auth with ChangeNotifier {
   //   return _accessToken;
   // }
 
-  String? get refreshToken {
-    return _refreshToken;
-  }
-
   String? get userType {
     return _userType;
   }
@@ -55,7 +51,6 @@ class Auth with ChangeNotifier {
             're_password': rePassword,
           }));
 
-      print('${resposne.statusCode} response body');
       final responseData = json.decode(resposne.body);
 
       if (resposne.statusCode == 201) {
@@ -69,7 +64,7 @@ class Auth with ChangeNotifier {
             fontSize: 16.0);
       } else {
         print('$responseData err');
-        AppPopup.showMyDialog(context, responseData.toString());
+        AppPopup.showMyDialog(context, json.decode(resposne.body)['detail']);
       }
     } catch (e) {
       AppPopup.showMyDialog(context, e.toString());
@@ -81,15 +76,19 @@ class Auth with ChangeNotifier {
     final url = Uri.parse('http://134.122.64.234/users/auth/jwt/token/');
 
     try {
-      final resposne = await http.post(url,
-          headers: {
-            "Connection": "keep-alive",
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
+      final resposne = await http.post(
+        url,
+        headers: {
+          "Connection": "keep-alive",
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          {
             'email': email,
             'password': password,
-          }));
+          },
+        ),
+      );
 
       final responseData = json.decode(resposne.body);
       if (resposne.statusCode == 200) {
@@ -143,21 +142,54 @@ class Auth with ChangeNotifier {
     return extractedData['accessToken'];
   }
 
-  Future<void> logout(BuildContext context) async {
-    final url = Uri.parse('url/api/user/logout/');
+  Future<bool> refreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('userData')) {
+      return false;
+    }
+    final extractedData =
+        json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
+    _refreshToken = extractedData['refreshToken'];
     try {
-      final response = await http.post(url, headers: {
-        // 'Authorization': 'accessToken $accessToken',
-        'connection': 'keep-alive'
-      });
-      if (response.statusCode == 200) {
+      final resposne = await http.post(
+          Uri.parse('http://134.122.64.234/api/auth/jwt/refresh/'),
+          headers: {
+            "Connection": "keep-alive",
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'refresh': _refreshToken,
+          }));
+
+      final responseData = json.decode(resposne.body);
+      print('${resposne.statusCode} refresh succeeded');
+      if (resposne.statusCode == 200) {
+        // get userType;
+        _accessToken = responseData['access'];
+        notifyListeners();
+        final prefs = await SharedPreferences.getInstance();
+        final userData = json.encode(
+            {'accessToken': _accessToken, 'refreshToken': _refreshToken});
+        prefs.setString('userData', userData);
+      } else {
         _accessToken = null;
+        _refreshToken = null;
         notifyListeners();
         final prefs = await SharedPreferences.getInstance();
         prefs.clear();
-      } else {}
+      }
     } catch (e) {
-      rethrow;
+      print(e);
     }
+    notifyListeners();
+    return true;
+  }
+
+  Future<void> logout(BuildContext context) async {
+    _accessToken = null;
+    _refreshToken = null;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
   }
 }

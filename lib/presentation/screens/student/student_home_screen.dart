@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_qr_code/data/store/auth.dart';
 import 'package:flutter_qr_code/presentation/screens/student/scan_qr_code_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_reports_screen.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 import '../../../utils/colors.dart';
 
@@ -14,6 +16,13 @@ class StudentHomeScreen extends StatefulWidget {
 
 class _StudentHomeScreenState extends State<StudentHomeScreen> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<Auth>(context, listen: false).refreshToken();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -21,9 +30,39 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
         height: getHeight(context),
         color: MyColors.myWhite,
         child: SingleChildScrollView(
-          child: Column(children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             SizedBox(
-              height: getHeight(context) * .1,
+              height: getHeight(context) * .06,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: InkWell(
+                onTap: () {
+                  Provider.of<Auth>(context, listen: false).logout(context);
+                },
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/logout.png',
+                      color: MyColors.myDarkPurple,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      'Logout',
+                      style: TextStyle(
+                          color: MyColors.myDarkPurple,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: getHeight(context) * .02,
             ),
             Container(
               width: getWidth(context),
