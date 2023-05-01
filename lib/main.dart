@@ -4,6 +4,7 @@ import 'package:flutter_qr_code/data/store/user_store.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/create_qr_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/doctor_courses_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/doctor_home_screen.dart';
+import 'package:flutter_qr_code/presentation/screens/loading_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/scan_qr_code_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_home_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_reports_screen.dart';
@@ -51,11 +52,11 @@ class MyApp extends StatelessWidget {
                 } else {
                   return FutureBuilder(
                     future: auth.tryAutoLogin(),
-                    builder: (ctx, authResultSnapshot) => authResultSnapshot
-                                .connectionState ==
-                            ConnectionState.waiting
-                        ? const CircularProgressIndicator(color: Colors.purple)
-                        : const AuthScreen(),
+                    builder: (ctx, authResultSnapshot) =>
+                        authResultSnapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? const LoadingScreen()
+                            : const AuthScreen(),
                   );
                 }
               },

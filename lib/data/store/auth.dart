@@ -11,19 +11,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Auth with ChangeNotifier {
   String? _accessToken;
   String? _refreshToken;
-  final String _userType = 'doctor';
+  String? _userType;
 
   bool get isAuth {
     return _accessToken != null;
   }
 
-  String? get accessToken {
-    return _accessToken;
-  }
-
-  String? get refreshToken {
-    return _refreshToken;
-  }
+  // String? get accessToken {
+  //   return _accessToken;
+  // }
 
   String? get userType {
     return _userType;
@@ -37,14 +33,13 @@ class Auth with ChangeNotifier {
       required String password,
       required String rePassword,
       required BuildContext context}) async {
-    final url = Uri.parse('http://10.0.2.2:8000/api/auth/users/');
+    final url = Uri.parse('http://134.122.64.234/api/v1/register/');
 
     try {
       final resposne = await http.post(url,
           headers: {
             "Connection": "keep-alive",
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Charset': 'utf-8'
+            'Content-Type': 'application/json',
           },
           body: jsonEncode({
             'first_name': name,
@@ -56,7 +51,6 @@ class Auth with ChangeNotifier {
             're_password': rePassword,
           }));
 
-      print('${resposne.statusCode} response body');
       final responseData = json.decode(resposne.body);
 
       if (resposne.statusCode == 201) {
@@ -69,8 +63,8 @@ class Auth with ChangeNotifier {
             textColor: Colors.white,
             fontSize: 16.0);
       } else {
-        AppPopup.showMyDialog(context, responseData.toString());
         print('$responseData err');
+        AppPopup.showMyDialog(context, json.decode(resposne.body)['detail']);
       }
     } catch (e) {
       AppPopup.showMyDialog(context, e.toString());
@@ -79,19 +73,22 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> login({required String email, required String password}) async {
-    final url = Uri.parse('http://10.0.2.2:8000/api/auth/jwt/create/');
+    final url = Uri.parse('http://134.122.64.234/users/auth/jwt/token/');
 
     try {
-      final resposne = await http.post(url,
-          headers: {
-            "Connection": "keep-alive",
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Charset': 'utf-8'
-          },
-          body: jsonEncode({
+      final resposne = await http.post(
+        url,
+        headers: {
+          "Connection": "keep-alive",
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          {
             'email': email,
             'password': password,
-          }));
+          },
+        ),
+      );
 
       final responseData = json.decode(resposne.body);
       if (resposne.statusCode == 200) {
@@ -106,8 +103,9 @@ class Auth with ChangeNotifier {
         // get userType;
         _accessToken = responseData['access'];
         _refreshToken = responseData['refresh'];
+        _userType = responseData['type'];
+
         notifyListeners();
-        print(_accessToken);
         final prefs = await SharedPreferences.getInstance();
         final userData = json.encode(
             {'accessToken': _accessToken, 'refreshToken': _refreshToken});
@@ -122,7 +120,7 @@ class Auth with ChangeNotifier {
 
   Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('userData') && accessToken != null) {
+    if (!prefs.containsKey('userData') && _accessToken != null) {
       return false;
     }
     final extractedData =
@@ -134,7 +132,7 @@ class Auth with ChangeNotifier {
 
   Future<String> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('userData') && accessToken != null) {
+    if (!prefs.containsKey('userData') && _accessToken != null) {
       return "";
     }
     final extractedData =
@@ -144,21 +142,54 @@ class Auth with ChangeNotifier {
     return extractedData['accessToken'];
   }
 
-  Future<void> logout(BuildContext context) async {
-    final url = Uri.parse('url/api/user/logout/');
+  Future<bool> refreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('userData')) {
+      return false;
+    }
+    final extractedData =
+        json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
+    _refreshToken = extractedData['refreshToken'];
     try {
-      final response = await http.post(url, headers: {
-        // 'Authorization': 'accessToken $accessToken',
-        'connection': 'keep-alive'
-      });
-      if (response.statusCode == 200) {
+      final resposne = await http.post(
+          Uri.parse('http://134.122.64.234/api/auth/jwt/refresh/'),
+          headers: {
+            "Connection": "keep-alive",
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'refresh': _refreshToken,
+          }));
+
+      final responseData = json.decode(resposne.body);
+      print('${resposne.statusCode} refresh succeeded');
+      if (resposne.statusCode == 200) {
+        // get userType;
+        _accessToken = responseData['access'];
+        notifyListeners();
+        final prefs = await SharedPreferences.getInstance();
+        final userData = json.encode(
+            {'accessToken': _accessToken, 'refreshToken': _refreshToken});
+        prefs.setString('userData', userData);
+      } else {
         _accessToken = null;
+        _refreshToken = null;
         notifyListeners();
         final prefs = await SharedPreferences.getInstance();
         prefs.clear();
-      } else {}
+      }
     } catch (e) {
-      rethrow;
+      print(e);
     }
+    notifyListeners();
+    return true;
+  }
+
+  Future<void> logout(BuildContext context) async {
+    _accessToken = null;
+    _refreshToken = null;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
   }
 }

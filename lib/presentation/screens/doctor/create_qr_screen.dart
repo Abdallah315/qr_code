@@ -28,7 +28,7 @@ class _CreateQrCodeScreenState extends State<CreateQrCodeScreen> {
             height: 20,
           ),
           Image.network(
-            'http://10.0.2.2:8000${args['imagePath']}',
+            'http://134.122.64.234${args['imagePath']}',
             width: getWidth(context) * .85,
             height: getHeight(context) * .6,
             headers: const {

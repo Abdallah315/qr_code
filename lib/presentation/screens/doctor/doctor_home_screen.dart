@@ -16,9 +16,8 @@ class DoctorHomeScreen extends StatefulWidget {
 class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
   @override
   void initState() {
-    Provider.of<Auth>(context, listen: false)
-        .getToken()
-        .then((value) => print(value));
+    Provider.of<Auth>(context, listen: false).refreshToken();
+
     super.initState();
   }
 
@@ -32,7 +31,36 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
         child: SingleChildScrollView(
           child: Column(children: [
             SizedBox(
-              height: getHeight(context) * .1,
+              height: getHeight(context) * .06,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: InkWell(
+                onTap: () {
+                  Provider.of<Auth>(context, listen: false).logout(context);
+                },
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/logout.png',
+                      color: MyColors.myDarkPurple,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      'Logout',
+                      style: TextStyle(
+                          color: MyColors.myDarkPurple,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: getHeight(context) * .02,
             ),
             Container(
               width: getWidth(context),

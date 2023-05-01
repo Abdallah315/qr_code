@@ -17,6 +17,7 @@ dependencies:
   persistent_bottom_nav_bar_v2:
   flutter_barcode_scanner: ^2.0.0
   barcode_widget: ^2.0.1
+  lottie: ^2.1.0
 
 dev_dependencies:
   flutter_test:

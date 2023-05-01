@@ -240,33 +240,39 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(
                 height: 25,
               ),
-              Text(
-                "Student ID",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: MyColors.myWhite,
-                  fontWeight: FontWeight.w700,
+              if (dropdownvalue == 'Student')
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Student ID",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: MyColors.myWhite,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    TextForm(
+                        controller: studentIdController,
+                        hintText: 'Your id',
+                        obscure: false,
+                        validator: (val) {
+                          if (val!.isEmpty) {
+                            return 'Enter your id';
+                          }
+                          return null;
+                        },
+                        onSaved: (val) {
+                          _authData['student-id'] = val!;
+                        }),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              TextForm(
-                  controller: studentIdController,
-                  hintText: 'Your id',
-                  obscure: false,
-                  validator: (val) {
-                    if (val!.isEmpty) {
-                      return 'Enter your id';
-                    }
-                    return null;
-                  },
-                  onSaved: (val) {
-                    _authData['student-id'] = val!;
-                  }),
-              const SizedBox(
-                height: 25,
-              ),
               Text(
                 "Role",
                 style: TextStyle(

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/store/auth.dart';
 import 'package:flutter_qr_code/data/store/course_store.dart';
+import 'package:flutter_qr_code/data/store/user_store.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
 import 'package:provider/provider.dart';
+
+import '../../../data/models/course.dart';
+import '../loading_screen.dart';
 
 class StudentReportsScreen extends StatefulWidget {
   static const routeName = '/student-report';
@@ -16,12 +20,11 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
   bool _isLoading = false;
   String dropdownvalue = '';
   var items;
+  List<Course>? course;
 
   @override
   void initState() {
-    setState(() {
-      _isLoading = true;
-    });
+    _isLoading = true;
     Provider.of<Auth>(context, listen: false).getToken().then((token) {
       Provider.of<CourseStore>(context, listen: false)
           .getStudentCourses(context, token)
@@ -34,8 +37,17 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
         if (items.length == 0) {
           dropdownvalue = 'no courses';
           items = ['no courses'];
+        } else {
+          dropdownvalue = items.first;
+          course =
+              Provider.of<CourseStore>(context, listen: false).studentCourses;
         }
-        print(items);
+        Provider.of<UserStore>(context, listen: false).getUser(context, token);
+        course?.forEach(
+          (e) {
+            print(e.id);
+          },
+        );
         setState(() {
           _isLoading = false;
         });
@@ -68,7 +80,7 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
             padding: const EdgeInsets.only(left: 15),
             child: _isLoading
                 ? const Center(
-                    child: CircularProgressIndicator.adaptive(),
+                    child: LoadingScreen(),
                   )
                 : Column(
                     children: [
@@ -92,20 +104,27 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Row(
-                              children: const [
-                                Text(
+                              children: [
+                                const Text(
                                   'Student Name: ',
                                   style: TextStyle(
                                       color: Color(0xff5D6A7A),
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500),
                                 ),
-                                Text(
-                                  'name',
-                                  style: TextStyle(
-                                      color: Color(0xff5D6A7A),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
+                                Consumer<UserStore>(
+                                  builder: (context, userStore, child) {
+                                    return Text(
+                                      userStore.user['username'] == null ||
+                                              userStore.user['username'] == ''
+                                          ? ''
+                                          : userStore.user['username'],
+                                      style: const TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500),
+                                    );
+                                  },
                                 )
                               ],
                             ),
@@ -140,8 +159,34 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                   width: getWidth(context) * .25,
                                   child: DropdownButton<String>(
                                     value: dropdownvalue,
-                                    onChanged: (String? newValue) {
+                                    onChanged: (String? newValue) async {
                                       setState(() => dropdownvalue = newValue!);
+                                      String token = await Provider.of<Auth>(
+                                              context,
+                                              listen: false)
+                                          .getToken();
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
+                                      // ignore: use_build_context_synchronously
+                                      Provider.of<CourseStore>(context,
+                                              listen: false)
+                                          .getStudentReport(
+                                              context,
+                                              token,
+                                              course!
+                                                  .where(
+                                                    (element) =>
+                                                        element.courseInfo!
+                                                            .description ==
+                                                        newValue,
+                                                  )
+                                                  .toList()
+                                                  .first
+                                                  .id!);
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
                                     },
                                     isExpanded: true,
 
@@ -194,52 +239,64 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                       const SizedBox(
                         height: 20,
                       ),
-                      Container(
-                        // width: getWidth(context) * .7,
-                        height: getHeight(context) * .18,
-                        color: const Color.fromARGB(255, 237, 241, 248),
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Row(
-                              children: const [
-                                Text(
-                                  'Lectures: ',
-                                  style: TextStyle(
-                                      color: Color(0xff5D6A7A),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
+                      Consumer<CourseStore>(
+                        builder: (context, courseStore, child) {
+                          return Container(
+                            // width: getWidth(context) * .7,
+                            height: getHeight(context) * .18,
+                            color: const Color.fromARGB(255, 237, 241, 248),
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Lectures: ',
+                                      style: TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    Text(
+                                      courseStore.studentReport == null
+                                          ? ''
+                                          : courseStore
+                                              .studentReport!.lectureCount
+                                              .toString(),
+                                      style: const TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500),
+                                    )
+                                  ],
                                 ),
-                                Text(
-                                  '1',
-                                  style: TextStyle(
-                                      color: Color(0xff5D6A7A),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
-                                )
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Sections: ',
+                                      style: TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    Text(
+                                      courseStore.studentReport == null
+                                          ? ''
+                                          : courseStore
+                                              .studentReport!.sectionCount
+                                              .toString(),
+                                      style: const TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500),
+                                    )
+                                  ],
+                                ),
                               ],
                             ),
-                            Row(
-                              children: const [
-                                Text(
-                                  'Sections: ',
-                                  style: TextStyle(
-                                      color: Color(0xff5D6A7A),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                Text(
-                                  '5',
-                                  style: TextStyle(
-                                      color: Color(0xff5D6A7A),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ],
                   ),
