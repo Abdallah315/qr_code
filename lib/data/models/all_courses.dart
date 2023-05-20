@@ -19,6 +19,9 @@ class AllCourses {
         title: json['title'],
         id: json['id'],
         doctors: List<Doctors>.from(
-            json['doctors'].map((item) => Doctors.fromJson(item))),
+          json['doctors'].map(
+            (item) => Doctors.fromJson(item),
+          ),
+        ),
       );
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/store/auth.dart';
 import 'package:flutter_qr_code/data/store/course_store.dart';
-import 'package:flutter_qr_code/data/store/user_store.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/create_qr_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/loading_screen.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
@@ -17,23 +16,39 @@ class DoctorCoursesScreen extends StatefulWidget {
 
 class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
   bool isLoading = false;
-  String coursesDropDown = '';
   String lecturesDropDown = '';
-  String periodsDropDown = '1';
+  String periodsDropDown = '5';
+  String coursesDropDown = '';
   String? courseId;
   String? lectureId;
   var lectures;
   List dummy = [];
   var courses;
-  var periods = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+  var periods = [
+    '5',
+    '10',
+    '15',
+    '20',
+    '25',
+    '30',
+    '35',
+    '40',
+    '45',
+    '50',
+    '55',
+    '60'
+  ];
 
   @override
   void initState() {
     setState(() {
       isLoading = true;
     });
+    Provider.of<Auth>(context, listen: false)
+        .getToken()
+        .then((value) => print(value));
+
     Provider.of<Auth>(context, listen: false).getToken().then((token) {
-      Provider.of<UserStore>(context, listen: false).getUser(context, token);
       Provider.of<CourseStore>(context, listen: false)
           .getAllLectures(context, token)
           .then((value) {
@@ -55,6 +70,7 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
       Provider.of<CourseStore>(context, listen: false)
           .getAllCourses(context, token)
           .then((value) {
+        // TODO :filter courses that belongs to the specific doctor
         courses = Provider.of<CourseStore>(context, listen: false)
             .allCourses
             .map((e) => e.description)

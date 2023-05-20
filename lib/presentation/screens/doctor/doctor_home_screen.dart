@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/store/auth.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/doctor_courses_screen.dart';
+import 'package:flutter_qr_code/presentation/screens/doctor/doctor_notification_screen.dart';
+import 'package:flutter_qr_code/presentation/screens/doctor/doctor_reports_screen.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -16,9 +18,8 @@ class DoctorHomeScreen extends StatefulWidget {
 class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
   @override
   void initState() {
-    Provider.of<Auth>(context, listen: false).refreshToken();
-
     super.initState();
+    Provider.of<Auth>(context, listen: false).refreshToken();
   }
 
   @override
@@ -85,17 +86,22 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                     height: getHeight(context) * 0.04,
                   ),
                   GestureDetector(
-                      onTap: () {},
+                      onTap: () => Navigator.of(context)
+                          .pushNamed(DoctorReportsScreen.routeName),
                       child: Image.asset('assets/images/reports.jpeg')),
                   SizedBox(
                     height: getHeight(context) * 0.04,
                   ),
                   GestureDetector(
-                      onTap: () {},
+                      onTap: () => Navigator.of(context)
+                          .pushNamed(DoctorNotificationScreen.routeName),
                       child: Image.asset('assets/images/notify students.jpeg')),
+                  SizedBox(
+                    height: getHeight(context) * .05,
+                  ),
                 ]),
               ),
-            )
+            ),
           ]),
         ),
       ),
