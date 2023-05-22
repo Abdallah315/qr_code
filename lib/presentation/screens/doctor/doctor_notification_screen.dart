@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/store/auth.dart';
@@ -127,6 +128,7 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
                                     child: TextForm(
                                         controller: notificationTitleController,
                                         obscure: false,
+                                        textFieldColor: MyColors.myDarkPurple,
                                         hintText: 'notification title',
                                         textColor: MyColors.myDarkPurple,
                                         color: const Color(0xffb8c0e5),
@@ -159,7 +161,7 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
                                             notificationSubtitleController,
                                         maxLines: 10,
                                         style: TextStyle(
-                                            color: MyColors.myWhite,
+                                            color: MyColors.myDarkPurple,
                                             fontSize: 13,
                                             fontWeight: FontWeight.w700),
                                         decoration: InputDecoration(
@@ -177,7 +179,7 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
                                             color: MyColors.myDarkPurple,
                                           ),
                                           filled: true,
-                                          fillColor: MyColors.myGrey,
+                                          fillColor: const Color(0xffb8c0e5),
                                           contentPadding:
                                               const EdgeInsets.symmetric(
                                                   vertical: 5, horizontal: 10),
@@ -312,12 +314,18 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
         // ! send data to the backend
         final token =
             await Provider.of<Auth>(context, listen: false).getToken();
-        Provider.of<CourseStore>(context, listen: false).sendNotification(
-            context,
-            token,
-            courseId!,
-            notificationTitleController.text,
-            notificationSubtitleController.text);
+        Provider.of<CourseStore>(context, listen: false)
+            .sendNotification(
+                context,
+                token,
+                courseId!,
+                notificationTitleController.text,
+                notificationSubtitleController.text)
+            .then((value) {
+          if (value) {
+            showSuccessBottomSheet(context);
+          }
+        });
       } catch (error) {
         const errorMessage =
             'Could not authenticate you. Please try again later.';
@@ -328,5 +336,54 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
         isLoading = false;
       });
     }
+  }
+
+  Future<void> showSuccessBottomSheet(
+    context,
+  ) async {
+    await showModalBottomSheet(
+      context: context,
+      isDismissible: true,
+      enableDrag: true,
+      useRootNavigator: true,
+      builder: (context) => Material(
+        color: Colors.white,
+        child: StatefulBuilder(
+          builder: (ctx, setState) => Container(
+            height: getHeight(ctx) / 2.3,
+            padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 16),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Lottie.asset('assets/images/green check-mark.json',
+                      width: 140, height: 140),
+                  const Text(
+                    'Notification sent successfuly',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff171d22),
+                      fixedSize: Size(MediaQuery.of(context).size.width * 0.7,
+                          MediaQuery.of(context).size.height * 0.08),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(35),
+                      ),
+                    ),
+                    onPressed: () =>
+                        Navigator.of(ctx, rootNavigator: true).pop(),
+                    child: const Text(
+                      "Done",
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ]),
+          ),
+        ),
+      ),
+    );
   }
 }

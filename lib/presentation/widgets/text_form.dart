@@ -13,6 +13,7 @@ class TextForm extends StatelessWidget {
       this.color,
       this.maxLines,
       this.textColor,
+      required this.textFieldColor,
       this.onTap})
       : super(key: key);
 
@@ -25,6 +26,7 @@ class TextForm extends StatelessWidget {
   final Color? color;
   final int? maxLines;
   final Color? textColor;
+  final Color? textFieldColor;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class TextForm extends StatelessWidget {
       obscureText: obscure,
       // maxLines: obscure ? 1 : maxLines,
       style: TextStyle(
-          color: MyColors.myWhite, fontSize: 13, fontWeight: FontWeight.w700),
+          color: textFieldColor, fontSize: 13, fontWeight: FontWeight.w700),
       decoration: InputDecoration(
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),

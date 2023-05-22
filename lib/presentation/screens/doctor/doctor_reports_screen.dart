@@ -370,7 +370,7 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
                                     Text(
                                       courseStore.studentReport == null
                                           ? 'No Data'
-                                          : '${courseStore.studentReport!.lecturePercent} %',
+                                          : '${courseStore.studentReport!.lecturePercent.toInt()} %',
                                       style: const TextStyle(
                                           color: Color(0xff5D6A7A),
                                           fontSize: 15,
@@ -390,7 +390,7 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
                                     Text(
                                       courseStore.studentReport == null
                                           ? 'No Data'
-                                          : '${courseStore.studentReport!.sectionPercent} %',
+                                          : '${courseStore.studentReport!.sectionPercent.toInt()} %',
                                       style: const TextStyle(
                                           color: Color(0xff5D6A7A),
                                           fontSize: 15,

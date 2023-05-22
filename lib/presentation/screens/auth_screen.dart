@@ -126,6 +126,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                textFieldColor: MyColors.myWhite,
                 controller: nameController,
                 obscure: false,
                 hintText: 'Jiara Martin',
@@ -154,6 +155,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: emailController,
                   obscure: false,
                   hintText: 'jiara@martin.com',
@@ -181,6 +183,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: passwordController,
                   hintText: 'your password',
                   obscure: showPass == true ? false : true,
@@ -217,6 +220,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: rePasswordController,
                   hintText: 'repeat your password',
                   obscure: showPass == true ? false : true,
@@ -257,6 +261,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       height: 5,
                     ),
                     TextForm(
+                        textFieldColor: MyColors.myWhite,
                         controller: studentIdController,
                         hintText: 'Your id',
                         obscure: false,
@@ -339,6 +344,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: emailController,
                   obscure: false,
                   hintText: 'jiara@martin.com',
@@ -366,6 +372,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: passwordController,
                   hintText: 'your password',
                   obscure: showPass == true ? false : true,

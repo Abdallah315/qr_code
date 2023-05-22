@@ -152,7 +152,7 @@ class CourseStore with ChangeNotifier {
     try {
       Response response = await post(
         Uri.parse(
-          'http://134.122.64.234/api/v1/doctors-profiles/send_notifications',
+          'http://134.122.64.234/api/v1/doctors-profiles/send_notifications/',
         ),
         headers: {
           "Connection": "keep-alive",
@@ -162,6 +162,7 @@ class CourseStore with ChangeNotifier {
         body: jsonEncode(
             {"title": title, "body": subtitle, "course_id": courseId}),
       );
+      print('$courseId $title $subtitle');
       print(
           '${response.statusCode} ===================================>>>>>>>>>>>>>>>>>>>>>>>>>>>');
       if (response.statusCode == 201) {
