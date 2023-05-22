@@ -153,23 +153,51 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
                                     height: 5,
                                   ),
                                   SizedBox(
-                                    width: getWidth(context) * .7,
-                                    child: TextForm(
+                                      width: getWidth(context) * .7,
+                                      child: TextFormField(
                                         controller:
                                             notificationSubtitleController,
-                                        obscure: false,
                                         maxLines: 10,
-                                        color: const Color(0xffb8c0e5),
-                                        textColor: MyColors.myDarkPurple,
-                                        hintText: 'notification body',
+                                        style: TextStyle(
+                                            color: MyColors.myWhite,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700),
+                                        decoration: InputDecoration(
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            borderSide: const BorderSide(
+                                              width: 2,
+                                              color: Color(0xffA6B3BF),
+                                            ),
+                                          ),
+                                          errorBorder: InputBorder.none,
+                                          hintText: 'notification body',
+                                          hintStyle: TextStyle(
+                                            color: MyColors.myDarkPurple,
+                                          ),
+                                          filled: true,
+                                          fillColor: MyColors.myGrey,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 5, horizontal: 10),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            borderSide: const BorderSide(
+                                              width: 2,
+                                              color: Color(0xffA6B3BF),
+                                            ),
+                                          ),
+                                        ),
                                         validator: (val) {
                                           if (val!.isEmpty) {
                                             return 'please make sure you\'ve entered the right data';
                                           }
                                           return null;
                                         },
-                                        onSaved: (val) {}),
-                                  ),
+                                        onSaved: (val) {},
+                                      )),
                                 ],
                               ),
                             ),

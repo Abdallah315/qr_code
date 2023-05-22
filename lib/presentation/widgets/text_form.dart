@@ -31,7 +31,7 @@ class TextForm extends StatelessWidget {
     return TextFormField(
       controller: controller,
       obscureText: obscure,
-      maxLines: maxLines,
+      // maxLines: obscure ? 1 : maxLines,
       style: TextStyle(
           color: MyColors.myWhite, fontSize: 13, fontWeight: FontWeight.w700),
       decoration: InputDecoration(

@@ -184,10 +184,11 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                                   )
                                                   .toList()
                                                   .first
-                                                  .courseInfo
-                                                  .id);
-                                      setState(() {
-                                        _isLoading = false;
+                                                  .courseId!)
+                                          .whenComplete(() {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
                                       });
                                     },
                                     isExpanded: true,
@@ -342,7 +343,7 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                     Text(
                                       courseStore.studentReport == null
                                           ? '0 %'
-                                          : '${courseStore.studentReport!.lecturePercent} %',
+                                          : '${courseStore.studentReport!.lecturePercent.toInt()} %',
                                       style: const TextStyle(
                                           color: Color(0xff5D6A7A),
                                           fontSize: 15,
@@ -362,7 +363,7 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                     Text(
                                       courseStore.studentReport == null
                                           ? '0 %'
-                                          : '${courseStore.studentReport!.sectionPercent} %',
+                                          : '${courseStore.studentReport!.sectionPercent.toInt()} %',
                                       style: const TextStyle(
                                           color: Color(0xff5D6A7A),
                                           fontSize: 15,

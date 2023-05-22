@@ -19,6 +19,9 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
   @override
   void initState() {
     super.initState();
+    Provider.of<Auth>(context, listen: false)
+        .getToken()
+        .then((value) => print(value));
     Provider.of<Auth>(context, listen: false).refreshToken();
   }
 

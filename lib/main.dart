@@ -8,6 +8,7 @@ import 'package:flutter_qr_code/presentation/screens/doctor/doctor_home_screen.d
 import 'package:flutter_qr_code/presentation/screens/doctor/doctor_notification_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/doctor/doctor_reports_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/loading_screen.dart';
+import 'package:flutter_qr_code/presentation/screens/student/notifications_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/scan_qr_code_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_home_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_reports_screen.dart';
@@ -117,6 +118,8 @@ class MyApp extends StatelessWidget {
                   const DoctorReportsScreen(),
               DoctorNotificationScreen.routeName: (context) =>
                   const DoctorNotificationScreen(),
+              NotificationsScreen.routeName: (context) =>
+                  const NotificationsScreen()
             },
           ),
         ));

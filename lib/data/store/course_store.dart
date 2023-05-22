@@ -79,6 +79,8 @@ class CourseStore with ChangeNotifier {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         _studentReport = StudentReport.fromJson(responseData);
+        print(
+            '${_studentReport?.lectureCount}  ${_studentReport?.lecturePercent}');
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
@@ -104,6 +106,8 @@ class CourseStore with ChangeNotifier {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         _studentReport = StudentReport.fromJson(responseData);
+        print(
+            '${_studentReport?.lectureCount}  ${_studentReport?.lecturePercent}');
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
