@@ -63,12 +63,10 @@ class Auth with ChangeNotifier {
             textColor: Colors.white,
             fontSize: 16.0);
       } else {
-        print('$responseData err');
         AppPopup.showMyDialog(context, json.decode(resposne.body)['detail']);
       }
     } catch (e) {
       AppPopup.showMyDialog(context, e.toString());
-      print('$e  e');
     }
   }
 
@@ -169,7 +167,6 @@ class Auth with ChangeNotifier {
           }));
 
       final responseData = json.decode(resposne.body);
-      print('${resposne.statusCode} refresh succeeded');
       if (resposne.statusCode == 200) {
         // get userType;
         _accessToken = responseData['access'];

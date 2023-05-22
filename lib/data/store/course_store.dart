@@ -45,7 +45,6 @@ class CourseStore with ChangeNotifier {
             'Charset': 'utf-8',
             'Authorization': 'JWT $token'
           });
-      print('${response.body}student courses');
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         _studentCourses = List<Course>.from(
@@ -75,12 +74,9 @@ class CourseStore with ChangeNotifier {
             'Content-Type': 'application/json',
             'Authorization': 'JWT $token'
           });
-      print(id);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         _studentReport = StudentReport.fromJson(responseData);
-        print(
-            '${_studentReport?.lectureCount}  ${_studentReport?.lecturePercent}');
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
@@ -106,8 +102,6 @@ class CourseStore with ChangeNotifier {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         _studentReport = StudentReport.fromJson(responseData);
-        print(
-            '${_studentReport?.lectureCount}  ${_studentReport?.lecturePercent}');
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
@@ -130,8 +124,6 @@ class CourseStore with ChangeNotifier {
             'Content-Type': 'application/json',
             'Authorization': 'JWT $token'
           });
-      print(
-          '${response.statusCode} ===================================>>>>>>>>>>>>>>>>>>>>>>>>>>>');
       if (response.statusCode == 201) {
         return true;
       } else if (response.statusCode == 401) {
@@ -162,9 +154,6 @@ class CourseStore with ChangeNotifier {
         body: jsonEncode(
             {"title": title, "body": subtitle, "course_id": courseId}),
       );
-      print('$courseId $title $subtitle');
-      print(
-          '${response.statusCode} ===================================>>>>>>>>>>>>>>>>>>>>>>>>>>>');
       if (response.statusCode == 201) {
         return true;
       } else if (response.statusCode == 401) {
@@ -199,7 +188,6 @@ class CourseStore with ChangeNotifier {
             (item) => AllCourses.fromJson(item),
           ),
         );
-        print('$_allCourses  store');
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
@@ -229,7 +217,6 @@ class CourseStore with ChangeNotifier {
             (item) => AllLectures.fromJson(item),
           ),
         );
-        print('$_allLectures  store');
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
@@ -261,7 +248,6 @@ class CourseStore with ChangeNotifier {
       if (response.statusCode == 201) {
         final responseData = json.decode(response.body);
         String imagePath = responseData['cur_qrcode'][0]['qrcode'];
-        print('$imagePath  image path');
         return imagePath;
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();

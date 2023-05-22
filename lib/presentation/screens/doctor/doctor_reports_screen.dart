@@ -37,7 +37,6 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
             .allCourses
             .map((item) => item.description)
             .toList();
-        print(items);
         if (items.length == 0) {
           dropdownvalue = 'no courses';
           items = ['no courses'];

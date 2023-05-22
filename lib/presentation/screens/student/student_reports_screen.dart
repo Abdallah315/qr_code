@@ -25,9 +25,6 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
   @override
   void initState() {
     _isLoading = true;
-    Provider.of<Auth>(context, listen: false)
-        .getToken()
-        .then((value) => print(value));
     Provider.of<Auth>(context, listen: false).getToken().then((token) {
       Provider.of<CourseStore>(context, listen: false)
           .getStudentCourses(context, token)

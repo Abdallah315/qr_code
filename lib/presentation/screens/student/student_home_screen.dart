@@ -2,7 +2,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/store/auth.dart';
 import 'package:flutter_qr_code/data/store/user_store.dart';
-import 'package:flutter_qr_code/presentation/screens/student/notifications_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/scan_qr_code_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_reports_screen.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
@@ -78,19 +77,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                           fontWeight: FontWeight.w700,
                           fontSize: 16),
                     ),
-                    const Spacer(),
-                    InkWell(
-                      onTap: () => Navigator.of(context)
-                          .pushNamed(NotificationsScreen.routeName),
-                      child: const SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: Icon(
-                          Icons.notifications_active,
-                          size: 30,
-                        ),
-                      ),
-                    )
                   ],
                 ),
               ),

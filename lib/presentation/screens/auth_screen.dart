@@ -404,7 +404,6 @@ class _AuthScreenState extends State<AuthScreen> {
       child: GestureDetector(
         onTap: () {
           _submit();
-          print(_authData);
         },
         child: Container(
           width: getWidth(context) * .85,

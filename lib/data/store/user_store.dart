@@ -52,8 +52,6 @@ class UserStore with ChangeNotifier {
           {"registration_id": fcm, "user": username, "type": "android"},
         ),
       );
-      print('$token ============>>>>>>>>>>>> $fcm $username');
-      print(response.body);
       if (response.statusCode == 200) {
         return true;
       } else {

@@ -44,9 +44,6 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
     setState(() {
       isLoading = true;
     });
-    Provider.of<Auth>(context, listen: false)
-        .getToken()
-        .then((value) => print(value));
 
     Provider.of<Auth>(context, listen: false).getToken().then((token) {
       Provider.of<CourseStore>(context, listen: false)
