@@ -51,10 +51,10 @@ class _ScanScreenState extends State<ScanScreen> {
     try {
       FlutterBarcodeScanner.scanBarcode('#2A99CF', 'cancel', true, ScanMode.QR)
           .then((value) async {
-        //! send the value to the backend
         if (value != -1) {
           String token =
               await Provider.of<Auth>(context, listen: false).getToken();
+          // ignore: use_build_context_synchronously
           Provider.of<CourseStore>(context, listen: false)
               .createStudentAttendance(context, token, value)
               .then((value) {

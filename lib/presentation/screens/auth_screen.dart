@@ -4,6 +4,7 @@ import 'package:flutter_qr_code/utils/constants.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/store/auth.dart';
+import '../widgets/text_form.dart';
 
 enum AuthMode { SignUp, Login }
 
@@ -125,6 +126,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                textFieldColor: MyColors.myWhite,
                 controller: nameController,
                 obscure: false,
                 hintText: 'Jiara Martin',
@@ -153,6 +155,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: emailController,
                   obscure: false,
                   hintText: 'jiara@martin.com',
@@ -180,6 +183,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: passwordController,
                   hintText: 'your password',
                   obscure: showPass == true ? false : true,
@@ -216,6 +220,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: rePasswordController,
                   hintText: 'repeat your password',
                   obscure: showPass == true ? false : true,
@@ -256,6 +261,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       height: 5,
                     ),
                     TextForm(
+                        textFieldColor: MyColors.myWhite,
                         controller: studentIdController,
                         hintText: 'Your id',
                         obscure: false,
@@ -338,6 +344,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: emailController,
                   obscure: false,
                   hintText: 'jiara@martin.com',
@@ -365,6 +372,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height: 5,
               ),
               TextForm(
+                  textFieldColor: MyColors.myWhite,
                   controller: passwordController,
                   hintText: 'your password',
                   obscure: showPass == true ? false : true,
@@ -396,7 +404,6 @@ class _AuthScreenState extends State<AuthScreen> {
       child: GestureDetector(
         onTap: () {
           _submit();
-          print(_authData);
         },
         child: Container(
           width: getWidth(context) * .85,
@@ -475,9 +482,9 @@ class _AuthScreenState extends State<AuthScreen> {
         if (_authMode == AuthMode.Login) {
           // Log user in
           await Provider.of<Auth>(context, listen: false).login(
-            email: _authData['email'].toString(),
-            password: _authData['password'].toString(),
-          );
+              email: _authData['email'].toString(),
+              password: _authData['password'].toString(),
+              context: context);
         } else {
           // Sign user up
           await Provider.of<Auth>(context, listen: false).register(
@@ -499,73 +506,5 @@ class _AuthScreenState extends State<AuthScreen> {
         isLoading = false;
       });
     }
-  }
-}
-
-class TextForm extends StatelessWidget {
-  const TextForm(
-      {Key? key,
-      required this.controller,
-      required this.obscure,
-      required this.hintText,
-      required this.onSaved,
-      required this.validator,
-      this.onTap})
-      : super(key: key);
-
-  final TextEditingController controller;
-  final bool obscure;
-  final String hintText;
-  final void Function(String?)? onSaved;
-  final String? Function(String?)? validator;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      style: TextStyle(
-          color: MyColors.myWhite, fontSize: 13, fontWeight: FontWeight.w700),
-      decoration: InputDecoration(
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(
-            width: 2,
-            color: Color(0xffA6B3BF),
-          ),
-        ),
-        errorBorder: InputBorder.none,
-        hintText: hintText,
-        hintStyle: TextStyle(
-          color: MyColors.myWhite.withOpacity(.5),
-        ),
-        filled: true,
-        fillColor: MyColors.myGrey,
-        suffix: hintText == 'كلمة السر الخاصة بالحساب'
-            ? GestureDetector(
-                onTap: onTap,
-                child: const Text(
-                  'إظهار',
-                  style: TextStyle(
-                    color: Color(0xffFF494B),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              )
-            : null,
-        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(
-            width: 2,
-            color: Color(0xffA6B3BF),
-          ),
-        ),
-      ),
-      validator: validator,
-      onSaved: onSaved,
-    );
   }
 }

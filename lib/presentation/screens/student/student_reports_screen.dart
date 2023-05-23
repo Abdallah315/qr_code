@@ -32,7 +32,7 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
         // items = Provider.of<CourseStore>(context, listen: false).studentCourses.map((item) => item.courseInfo!.title).toList();
         items = Provider.of<CourseStore>(context, listen: false)
             .studentCourses
-            .map((item) => item.courseInfo!.description)
+            .map((item) => item.courseInfo.description)
             .toList();
         if (items.length == 0) {
           dropdownvalue = 'no courses';
@@ -43,11 +43,6 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
               Provider.of<CourseStore>(context, listen: false).studentCourses;
         }
         Provider.of<UserStore>(context, listen: false).getUser(context, token);
-        course?.forEach(
-          (e) {
-            print(e.id);
-          },
-        );
         setState(() {
           _isLoading = false;
         });
@@ -82,22 +77,25 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                 ? const Center(
                     child: LoadingScreen(),
                   )
-                : Column(
+                : ListView(
                     children: [
-                      const SizedBox(
-                        height: 70,
+                      SizedBox(
+                        height: getHeight(context) * .05,
                       ),
-                      const Text(
-                        'Reports Card',
-                        style: TextStyle(
-                            fontSize: 35, fontWeight: FontWeight.w700),
+                      const Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Reports Card',
+                          style: TextStyle(
+                              fontSize: 35, fontWeight: FontWeight.w700),
+                        ),
                       ),
                       SizedBox(
-                        height: getHeight(context) * .08,
+                        height: getHeight(context) * .05,
                       ),
                       Container(
                         width: getWidth(context) * .7,
-                        height: getHeight(context) * .25,
+                        height: getHeight(context) * .2,
                         color: const Color.fromARGB(255, 237, 241, 248),
                         padding: const EdgeInsets.all(10),
                         child: Column(
@@ -109,7 +107,7 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                   'Student Name: ',
                                   style: TextStyle(
                                       color: Color(0xff5D6A7A),
-                                      fontSize: 18,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.w500),
                                 ),
                                 Consumer<UserStore>(
@@ -121,42 +119,42 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                           : userStore.user['username'],
                                       style: const TextStyle(
                                           color: Color(0xff5D6A7A),
-                                          fontSize: 18,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     );
                                   },
                                 )
                               ],
                             ),
-                            Row(
-                              children: const [
-                                Text(
-                                  'Grade: ',
-                                  style: TextStyle(
-                                      color: Color(0xff5D6A7A),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                Text(
-                                  '50',
-                                  style: TextStyle(
-                                      color: Color(0xff5D6A7A),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
-                                )
-                              ],
-                            ),
+                            // Row(
+                            //   children: const [
+                            //     Text(
+                            //       'Grade: ',
+                            //       style: TextStyle(
+                            //           color: Color(0xff5D6A7A),
+                            //           fontSize: 15,
+                            //           fontWeight: FontWeight.w500),
+                            //     ),
+                            //     Text(
+                            //       '50',
+                            //       style: TextStyle(
+                            //           color: Color(0xff5D6A7A),
+                            //           fontSize: 15,
+                            //           fontWeight: FontWeight.w500),
+                            //     )
+                            //   ],
+                            // ),
                             Row(
                               children: [
                                 const Text(
                                   'Choose Subject: ',
                                   style: TextStyle(
                                       color: Color(0xff5D6A7A),
-                                      fontSize: 18,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.w500),
                                 ),
                                 SizedBox(
-                                  width: getWidth(context) * .25,
+                                  width: getWidth(context) * .3,
                                   child: DropdownButton<String>(
                                     value: dropdownvalue,
                                     onChanged: (String? newValue) async {
@@ -177,15 +175,17 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                               course!
                                                   .where(
                                                     (element) =>
-                                                        element.courseInfo!
+                                                        element.courseInfo
                                                             .description ==
                                                         newValue,
                                                   )
                                                   .toList()
                                                   .first
-                                                  .id!);
-                                      setState(() {
-                                        _isLoading = false;
+                                                  .courseId!)
+                                          .whenComplete(() {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
                                       });
                                     },
                                     isExpanded: true,
@@ -229,9 +229,9 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                         padding: const EdgeInsets.all(10),
                         alignment: Alignment.centerLeft,
                         child: const Text(
-                          'Your Attendance',
+                          'Your Attendance Count',
                           style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 15,
                               color: Colors.white,
                               fontWeight: FontWeight.w500),
                         ),
@@ -243,7 +243,7 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                         builder: (context, courseStore, child) {
                           return Container(
                             // width: getWidth(context) * .7,
-                            height: getHeight(context) * .18,
+                            height: getHeight(context) * .15,
                             color: const Color.fromARGB(255, 237, 241, 248),
                             padding: const EdgeInsets.all(10),
                             child: Column(
@@ -255,18 +255,18 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                       'Lectures: ',
                                       style: TextStyle(
                                           color: Color(0xff5D6A7A),
-                                          fontSize: 18,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     ),
                                     Text(
                                       courseStore.studentReport == null
-                                          ? ''
+                                          ? '0'
                                           : courseStore
                                               .studentReport!.lectureCount
                                               .toString(),
                                       style: const TextStyle(
                                           color: Color(0xff5D6A7A),
-                                          fontSize: 18,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     )
                                   ],
@@ -277,18 +277,93 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                                       'Sections: ',
                                       style: TextStyle(
                                           color: Color(0xff5D6A7A),
-                                          fontSize: 18,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     ),
                                     Text(
                                       courseStore.studentReport == null
-                                          ? ''
+                                          ? '0'
                                           : courseStore
                                               .studentReport!.sectionCount
                                               .toString(),
                                       style: const TextStyle(
                                           color: Color(0xff5D6A7A),
-                                          fontSize: 18,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        height: 40,
+                        width: double.infinity,
+                        color: const Color(0xff161E4C),
+                        padding: const EdgeInsets.all(10),
+                        alignment: Alignment.centerLeft,
+                        child: const Text(
+                          'Your Attendance Percentage',
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Consumer<CourseStore>(
+                        builder: (context, courseStore, child) {
+                          return Container(
+                            // width: getWidth(context) * .7,
+                            height: getHeight(context) * .15,
+                            color: const Color.fromARGB(255, 237, 241, 248),
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Lectures: ',
+                                      style: TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    Text(
+                                      courseStore.studentReport == null
+                                          ? '0 %'
+                                          : '${courseStore.studentReport!.lecturePercent.toInt()} %',
+                                      style: const TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Sections: ',
+                                      style: TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    Text(
+                                      courseStore.studentReport == null
+                                          ? '0 %'
+                                          : '${courseStore.studentReport!.sectionPercent.toInt()} %',
+                                      style: const TextStyle(
+                                          color: Color(0xff5D6A7A),
+                                          fontSize: 15,
                                           fontWeight: FontWeight.w500),
                                     )
                                   ],

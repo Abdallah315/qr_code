@@ -63,16 +63,17 @@ class Auth with ChangeNotifier {
             textColor: Colors.white,
             fontSize: 16.0);
       } else {
-        print('$responseData err');
         AppPopup.showMyDialog(context, json.decode(resposne.body)['detail']);
       }
     } catch (e) {
       AppPopup.showMyDialog(context, e.toString());
-      print('$e  e');
     }
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login(
+      {required String email,
+      required String password,
+      required BuildContext context}) async {
     final url = Uri.parse('http://134.122.64.234/users/auth/jwt/token/');
 
     try {
@@ -107,14 +108,17 @@ class Auth with ChangeNotifier {
 
         notifyListeners();
         final prefs = await SharedPreferences.getInstance();
-        final userData = json.encode(
-            {'accessToken': _accessToken, 'refreshToken': _refreshToken});
+        final userData = json.encode({
+          'accessToken': _accessToken,
+          'refreshToken': _refreshToken,
+          'userType': _userType
+        });
         prefs.setString('userData', userData);
       } else {
-        print(responseData);
+        AppPopup.showMyDialog(context, json.decode(resposne.body)['detail']);
       }
     } catch (e) {
-      print(e);
+      AppPopup.showMyDialog(context, json.decode(e.toString())['detail']);
     }
   }
 
@@ -126,6 +130,7 @@ class Auth with ChangeNotifier {
     final extractedData =
         json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
     _accessToken = extractedData['accessToken'];
+    _userType = extractedData['userType'];
     notifyListeners();
     return true;
   }
@@ -162,7 +167,6 @@ class Auth with ChangeNotifier {
           }));
 
       final responseData = json.decode(resposne.body);
-      print('${resposne.statusCode} refresh succeeded');
       if (resposne.statusCode == 200) {
         // get userType;
         _accessToken = responseData['access'];
@@ -170,7 +174,7 @@ class Auth with ChangeNotifier {
         final prefs = await SharedPreferences.getInstance();
         final userData = json.encode(
             {'accessToken': _accessToken, 'refreshToken': _refreshToken});
-        prefs.setString('userData', userData);
+        prefs.setString('tokenData', userData);
       } else {
         _accessToken = null;
         _refreshToken = null;

@@ -1,5 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_code/data/store/auth.dart';
+import 'package:flutter_qr_code/data/store/user_store.dart';
 import 'package:flutter_qr_code/presentation/screens/student/scan_qr_code_screen.dart';
 import 'package:flutter_qr_code/presentation/screens/student/student_reports_screen.dart';
 import 'package:flutter_qr_code/utils/constants.dart';
@@ -19,7 +21,25 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Provider.of<Auth>(context, listen: false).refreshToken();
+
+    Provider.of<Auth>(context, listen: false).refreshToken().whenComplete(() {
+      initialStep();
+    });
+  }
+
+  initialStep() async {
+    final token = await Provider.of<Auth>(context, listen: false).getToken();
+    Provider.of<UserStore>(context, listen: false)
+        .getUser(context, token)
+        .then((value) {
+      FirebaseMessaging.instance.getToken().then((fcm) {
+        Provider.of<UserStore>(context, listen: false).sendFcmToken(
+            context,
+            fcm!,
+            Provider.of<UserStore>(context, listen: false).user['username'],
+            token);
+      });
+    });
   }
 
   @override
@@ -56,7 +76,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                           color: MyColors.myDarkPurple,
                           fontWeight: FontWeight.w700,
                           fontSize: 16),
-                    )
+                    ),
                   ],
                 ),
               ),

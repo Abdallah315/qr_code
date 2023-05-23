@@ -45,7 +45,6 @@ class CourseStore with ChangeNotifier {
             'Charset': 'utf-8',
             'Authorization': 'JWT $token'
           });
-      print(response.statusCode);
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         _studentCourses = List<Course>.from(
@@ -75,7 +74,31 @@ class CourseStore with ChangeNotifier {
             'Content-Type': 'application/json',
             'Authorization': 'JWT $token'
           });
-      print('$id from student report');
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        _studentReport = StudentReport.fromJson(responseData);
+      } else if (response.statusCode == 401) {
+        Provider.of<Auth>(context, listen: false).refreshToken();
+      } else {
+        AppPopup.showMyDialog(context, json.decode(response.body)['detail']);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> getStudentReportForDoctor(BuildContext context, String token,
+      String courseId, String studentUsername) async {
+    try {
+      Response response = await get(
+          Uri.parse(
+            'http://134.122.64.234/api/v1/students-profiles/attendance_report_by_username_and_course/$courseId/$studentUsername/',
+          ),
+          headers: {
+            "Connection": "keep-alive",
+            'Content-Type': 'application/json',
+            'Authorization': 'JWT $token'
+          });
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         _studentReport = StudentReport.fromJson(responseData);
@@ -92,7 +115,7 @@ class CourseStore with ChangeNotifier {
   Future<bool> createStudentAttendance(
       BuildContext context, String token, String id) async {
     try {
-      Response response = await get(
+      Response response = await post(
           Uri.parse(
             'http://134.122.64.234/api/v1/students-profiles/create_student_attendance/$id/',
           ),
@@ -101,8 +124,37 @@ class CourseStore with ChangeNotifier {
             'Content-Type': 'application/json',
             'Authorization': 'JWT $token'
           });
-      print(id);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
+        return true;
+      } else if (response.statusCode == 401) {
+        Provider.of<Auth>(context, listen: false).refreshToken();
+        return false;
+      } else {
+        AppPopup.showMyDialog(context, json.decode(response.body)['detail']);
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> sendNotification(BuildContext context, String token,
+      String courseId, String title, String subtitle) async {
+    try {
+      Response response = await post(
+        Uri.parse(
+          'http://134.122.64.234/api/v1/doctors-profiles/send_notifications/',
+        ),
+        headers: {
+          "Connection": "keep-alive",
+          'Content-Type': 'application/json',
+          'Authorization': 'JWT $token'
+        },
+        body: jsonEncode(
+            {"title": title, "body": subtitle, "course_id": courseId}),
+      );
+      if (response.statusCode == 201) {
         return true;
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
@@ -136,7 +188,6 @@ class CourseStore with ChangeNotifier {
             (item) => AllCourses.fromJson(item),
           ),
         );
-        print('$_allCourses  store');
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
@@ -166,7 +217,6 @@ class CourseStore with ChangeNotifier {
             (item) => AllLectures.fromJson(item),
           ),
         );
-        print('$_allLectures  store');
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
       } else {
@@ -198,7 +248,6 @@ class CourseStore with ChangeNotifier {
       if (response.statusCode == 201) {
         final responseData = json.decode(response.body);
         String imagePath = responseData['cur_qrcode'][0]['qrcode'];
-        print('$imagePath  image path');
         return imagePath;
       } else if (response.statusCode == 401) {
         Provider.of<Auth>(context, listen: false).refreshToken();
