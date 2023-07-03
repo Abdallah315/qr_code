@@ -228,7 +228,7 @@ class CourseStore with ChangeNotifier {
   }
 
   Future<String> createAttendanceRequest(BuildContext context, String token,
-      String courseId, String lectureId, int period) async {
+      String courseId, String lectureId, int period, int weekNum) async {
     try {
       Response response = await post(
           Uri.parse(
@@ -244,6 +244,7 @@ class CourseStore with ChangeNotifier {
             "lecture": lectureId,
             "course": courseId,
             "period": period,
+            "week_no": weekNum,
           }));
       if (response.statusCode == 201) {
         final responseData = json.decode(response.body);

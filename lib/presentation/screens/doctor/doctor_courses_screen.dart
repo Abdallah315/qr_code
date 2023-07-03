@@ -22,6 +22,8 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
   String? courseId;
   String? lectureId;
   var lectures;
+  final TextEditingController _controller = TextEditingController();
+
   List dummy = [];
   var courses;
   var periods = [
@@ -120,222 +122,258 @@ class _DoctorCoursesScreenState extends State<DoctorCoursesScreen> {
           padding: isLoading ? null : const EdgeInsets.only(left: 15),
           child: isLoading
               ? const LoadingScreen()
-              : Column(
-                  children: [
-                    const SizedBox(
-                      height: 70,
-                    ),
-                    const Text(
-                      'Choose lecture',
-                      style:
-                          TextStyle(fontSize: 35, fontWeight: FontWeight.w700),
-                    ),
-                    SizedBox(
-                      height: getHeight(context) * .08,
-                    ),
-                    Container(
-                      width: getWidth(context) * .7,
-                      height: getHeight(context) * .25,
-                      color: const Color.fromARGB(255, 237, 241, 248),
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                'Choose Subject: ',
-                                style: TextStyle(
-                                    color: Color(0xff5D6A7A),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                              SizedBox(
-                                width: getWidth(context) * .25,
-                                child: DropdownButton<String>(
-                                  value: coursesDropDown,
-                                  onChanged: (String? newValue) {
-                                    setState(() => coursesDropDown = newValue!);
-                                    courseId = Provider.of<CourseStore>(context,
-                                            listen: false)
-                                        .allCourses
-                                        .where((element) =>
-                                            element.description == newValue)
-                                        .toList()
-                                        .first
-                                        .id;
-                                  },
-                                  isExpanded: true,
-
-                                  items: courses != null
-                                      ? courses
-                                          .map<DropdownMenuItem<String>>(
-                                              (String? value) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: value,
-                                                    child: Center(
-                                                        child: Text(
-                                                      value!,
-                                                      style: const TextStyle(
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff5D6A7A),
-                                                      ),
-                                                    )),
-                                                  ))
-                                          .toList()
-                                      : [],
-
-                                  // add extra sugar..
-                                  icon: const Icon(Icons.arrow_drop_down),
-                                  iconSize: 20,
-                                  underline: const SizedBox(),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                'Choose Lecture: ',
-                                style: TextStyle(
-                                    color: Color(0xff5D6A7A),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                              SizedBox(
-                                width: getWidth(context) * .25,
-                                child: DropdownButton<String>(
-                                  value: lecturesDropDown,
-                                  onChanged: (String? newValue) {
-                                    setState(
-                                        () => lecturesDropDown = newValue!);
-                                    lectureId = Provider.of<CourseStore>(
-                                            context,
-                                            listen: false)
-                                        .allLectures
-                                        .where((element) =>
-                                            element.title == newValue)
-                                        .toList()
-                                        .first
-                                        .id;
-                                  },
-                                  isExpanded: true,
-
-                                  items: lectures != null
-                                      ? lectures
-                                          .map<DropdownMenuItem<String>>(
-                                              (String? value) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: value,
-                                                    child: Center(
-                                                        child: Text(
-                                                      value!,
-                                                      style: const TextStyle(
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xff5D6A7A),
-                                                      ),
-                                                    )),
-                                                  ))
-                                          .toList()
-                                      : [],
-
-                                  // add extra sugar..
-                                  icon: const Icon(Icons.arrow_drop_down),
-                                  iconSize: 20,
-                                  underline: const SizedBox(),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                'Choose Period: ',
-                                style: TextStyle(
-                                    color: Color(0xff5D6A7A),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                              SizedBox(
-                                width: getWidth(context) * .25,
-                                child: DropdownButton<String>(
-                                  value: periodsDropDown,
-                                  onChanged: (String? newValue) {
-                                    setState(() => periodsDropDown = newValue!);
-                                  },
-                                  isExpanded: true,
-
-                                  items: periods
-                                      .map<DropdownMenuItem<String>>(
-                                          (String? value) =>
-                                              DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Center(
-                                                    child: Text(
-                                                  value!,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff5D6A7A),
-                                                  ),
-                                                )),
-                                              ))
-                                      .toList(),
-
-                                  // add extra sugar..
-                                  icon: const Icon(Icons.arrow_drop_down),
-                                  iconSize: 20,
-                                  underline: const SizedBox(),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+              : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 70,
                       ),
-                    ),
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        // ! create attendance req
-                        var token =
-                            await Provider.of<Auth>(context, listen: false)
-                                .getToken();
-                        // ignore: use_build_context_synchronously
-                        String imagePath = await Provider.of<CourseStore>(
-                                context,
-                                listen: false)
-                            .createAttendanceRequest(context, token, courseId!,
-                                lectureId!, int.parse(periodsDropDown));
-                        if (imagePath != 'no image path') {
-                          if (context.mounted) {
-                            Navigator.of(context).pushNamed(
-                                CreateQrCodeScreen.routeName,
-                                arguments: {'imagePath': imagePath});
+                      const Text(
+                        'Choose lecture',
+                        style: TextStyle(
+                            fontSize: 35, fontWeight: FontWeight.w700),
+                      ),
+                      SizedBox(
+                        height: getHeight(context) * .08,
+                      ),
+                      Container(
+                        width: getWidth(context) * .7,
+                        height: getHeight(context) * .25,
+                        color: const Color.fromARGB(255, 237, 241, 248),
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Row(
+                              children: [
+                                const Text(
+                                  'Choose Subject: ',
+                                  style: TextStyle(
+                                      color: Color(0xff5D6A7A),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(
+                                  width: getWidth(context) * .25,
+                                  child: DropdownButton<String>(
+                                    value: coursesDropDown,
+                                    onChanged: (String? newValue) {
+                                      setState(
+                                          () => coursesDropDown = newValue!);
+                                      courseId = Provider.of<CourseStore>(
+                                              context,
+                                              listen: false)
+                                          .allCourses
+                                          .where((element) =>
+                                              element.description == newValue)
+                                          .toList()
+                                          .first
+                                          .id;
+                                    },
+                                    isExpanded: true,
+
+                                    items: courses != null
+                                        ? courses
+                                            .map<DropdownMenuItem<String>>(
+                                                (String? value) =>
+                                                    DropdownMenuItem<String>(
+                                                      value: value,
+                                                      child: Center(
+                                                          child: Text(
+                                                        value!,
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff5D6A7A),
+                                                        ),
+                                                      )),
+                                                    ))
+                                            .toList()
+                                        : [],
+
+                                    // add extra sugar..
+                                    icon: const Icon(Icons.arrow_drop_down),
+                                    iconSize: 20,
+                                    underline: const SizedBox(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Choose Type: ',
+                                  style: TextStyle(
+                                      color: Color(0xff5D6A7A),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(
+                                  width: getWidth(context) * .25,
+                                  child: DropdownButton<String>(
+                                    value: lecturesDropDown,
+                                    onChanged: (String? newValue) {
+                                      setState(
+                                          () => lecturesDropDown = newValue!);
+                                      lectureId = Provider.of<CourseStore>(
+                                              context,
+                                              listen: false)
+                                          .allLectures
+                                          .where((element) =>
+                                              element.title == newValue)
+                                          .toList()
+                                          .first
+                                          .id;
+                                    },
+                                    isExpanded: true,
+
+                                    items: lectures != null
+                                        ? lectures
+                                            .map<DropdownMenuItem<String>>(
+                                                (String? value) =>
+                                                    DropdownMenuItem<String>(
+                                                      value: value,
+                                                      child: Center(
+                                                          child: Text(
+                                                        value!,
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xff5D6A7A),
+                                                        ),
+                                                      )),
+                                                    ))
+                                            .toList()
+                                        : [],
+
+                                    // add extra sugar..
+                                    icon: const Icon(Icons.arrow_drop_down),
+                                    iconSize: 20,
+                                    underline: const SizedBox(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Qr Code Time: ',
+                                  style: TextStyle(
+                                      color: Color(0xff5D6A7A),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(
+                                  width: getWidth(context) * .25,
+                                  child: DropdownButton<String>(
+                                    value: periodsDropDown,
+                                    onChanged: (String? newValue) {
+                                      setState(
+                                          () => periodsDropDown = newValue!);
+                                    },
+                                    isExpanded: true,
+
+                                    items: periods
+                                        .map<DropdownMenuItem<String>>(
+                                            (String? value) =>
+                                                DropdownMenuItem<String>(
+                                                  value: value,
+                                                  child: Center(
+                                                      child: Text(
+                                                    value!,
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff5D6A7A),
+                                                    ),
+                                                  )),
+                                                ))
+                                        .toList(),
+
+                                    // add extra sugar..
+                                    icon: const Icon(Icons.arrow_drop_down),
+                                    iconSize: 20,
+                                    underline: const SizedBox(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'The Week: ',
+                                  style: TextStyle(
+                                      color: Color(0xff5D6A7A),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(
+                                  width: 30,
+                                ),
+                                SizedBox(
+                                  width: getWidth(context) * .25,
+                                  height: 20,
+                                  child: Center(
+                                    child: TextField(
+                                      onChanged: (value) => setState(() {}),
+                                      controller: _controller,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 50,
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          // ! create attendance req
+                          var token =
+                              await Provider.of<Auth>(context, listen: false)
+                                  .getToken();
+                          // ignore: use_build_context_synchronously
+                          String imagePath = await Provider.of<CourseStore>(
+                                  context,
+                                  listen: false)
+                              .createAttendanceRequest(
+                            context,
+                            token,
+                            courseId!,
+                            lectureId!,
+                            int.parse(periodsDropDown),
+                            int.parse(_controller.text),
+                          );
+                          if (imagePath != 'no image path') {
+                            if (context.mounted) {
+                              Navigator.of(context).pushNamed(
+                                  CreateQrCodeScreen.routeName,
+                                  arguments: {'imagePath': imagePath});
+                            }
                           }
-                        }
-                        setState(() {
-                          isLoading = false;
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff161E4C),
-                          fixedSize: Size(getWidth(context) * 0.6, 60)),
-                      child: const Text(
-                        ('Create QR'),
+                          setState(() {
+                            isLoading = false;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xff161E4C),
+                            fixedSize: Size(getWidth(context) * 0.6, 60)),
+                        child: const Text(
+                          ('Create QR'),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
         )
       ]),

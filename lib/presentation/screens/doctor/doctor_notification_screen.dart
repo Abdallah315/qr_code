@@ -324,8 +324,6 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
           }
         });
       } catch (error) {
-        const errorMessage =
-            'Could not authenticate you. Please try again later.';
         print('canot handle $error');
       }
 

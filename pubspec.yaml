@@ -20,6 +20,10 @@ dependencies:
   lottie: ^2.1.0
   firebase_core: ^2.11.0
   firebase_messaging: ^14.5.0
+  path_provider:
+  open_file:
+  dio:
+  flutter_file_downloader: ^1.1.2
 
 dev_dependencies:
   flutter_test:

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../../data/store/auth.dart';
 import '../widgets/text_form.dart';
 
-enum AuthMode { SignUp, Login }
+enum AuthMode { signUp, login }
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -21,7 +21,7 @@ class _AuthScreenState extends State<AuthScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController rePasswordController = TextEditingController();
   TextEditingController studentIdController = TextEditingController();
-  AuthMode _authMode = AuthMode.SignUp;
+  AuthMode _authMode = AuthMode.signUp;
   final GlobalKey<FormState> _formkey = GlobalKey();
   final Map<String, dynamic> _authData = {
     'name': '',
@@ -68,7 +68,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: getHeight(context) * .03,
                   ),
                   Text(
-                    'Create New\n Account',
+                    _authMode == AuthMode.signUp
+                        ? 'Create New\n Account'
+                        : 'Login',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 35,
@@ -79,7 +81,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   SizedBox(
                     height: getHeight(context) * .02,
                   ),
-                  _authMode == AuthMode.SignUp
+                  _authMode == AuthMode.signUp
                       ? buildSignUpForm()
                       : buildLoginForm(),
                   SizedBox(
@@ -415,7 +417,7 @@ class _AuthScreenState extends State<AuthScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _authMode == AuthMode.SignUp ? 'Sign up' : 'Login',
+                _authMode == AuthMode.signUp ? 'Sign up' : 'login',
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -433,7 +435,7 @@ class _AuthScreenState extends State<AuthScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          _authMode == AuthMode.SignUp
+          _authMode == AuthMode.signUp
               ? 'Already have an account?'
               : 'Don\'t have an account?',
           style: TextStyle(
@@ -450,18 +452,18 @@ class _AuthScreenState extends State<AuthScreen> {
             passwordController.clear();
             emailController.clear();
             rePasswordController.clear();
-            if (_authMode == AuthMode.SignUp) {
+            if (_authMode == AuthMode.signUp) {
               setState(() {
-                _authMode = AuthMode.Login;
+                _authMode = AuthMode.login;
               });
             } else {
               setState(() {
-                _authMode = AuthMode.SignUp;
+                _authMode = AuthMode.signUp;
               });
             }
           },
           child: Text(
-            _authMode == AuthMode.SignUp ? 'Login Now' : 'Register Now',
+            _authMode == AuthMode.signUp ? 'login Now' : 'Register Now',
             style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
@@ -479,7 +481,7 @@ class _AuthScreenState extends State<AuthScreen> {
         isLoading = true;
       });
       try {
-        if (_authMode == AuthMode.Login) {
+        if (_authMode == AuthMode.login) {
           // Log user in
           await Provider.of<Auth>(context, listen: false).login(
               email: _authData['email'].toString(),
@@ -497,8 +499,6 @@ class _AuthScreenState extends State<AuthScreen> {
               rePassword: _authData['re-password'].toString());
         }
       } catch (error) {
-        const errorMessage =
-            'Could not authenticate you. Please try again later.';
         print('canot handle $error');
       }
 

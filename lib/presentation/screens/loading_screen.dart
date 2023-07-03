@@ -19,13 +19,13 @@ class LoadingScreen extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+          child: const Padding(
+            padding: EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   SizedBox(height: 10),
                   CircularProgressIndicator(
                     color: Color(0xff161E4C),

@@ -1,6 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
+import 'package:path/path.dart' as path;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_qr_code/data/models/all_courses.dart';
 import 'package:flutter_qr_code/data/store/auth.dart';
 import 'package:flutter_qr_code/data/store/course_store.dart';
@@ -22,7 +27,9 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
   bool _isLoading = false;
   String dropdownvalue = '';
   var items;
+  var _progress;
   String? courseId;
+  String? courseName;
   List<AllCourses>? course;
   final TextEditingController _controller = TextEditingController();
 
@@ -44,6 +51,7 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
           dropdownvalue = items.first;
           course = Provider.of<CourseStore>(context, listen: false).allCourses;
           courseId = course?.first.id;
+          courseName = course?.first.description;
         }
         setState(() {
           _isLoading = false;
@@ -106,7 +114,7 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
                       const Align(
                         alignment: Alignment.center,
                         child: Text(
-                          'Reports Card',
+                          'Reports',
                           style: TextStyle(
                               fontSize: 35, fontWeight: FontWeight.w700),
                         ),
@@ -116,7 +124,7 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
                       ),
                       Container(
                         width: getWidth(context) * .7,
-                        height: getHeight(context) * .23,
+                        height: getHeight(context) * .25,
                         color: const Color.fromARGB(255, 237, 241, 248),
                         padding: const EdgeInsets.all(10),
                         child: Column(
@@ -163,7 +171,7 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
                                       //         context,
                                       //         listen: false)
                                       //     .getToken();
-                                      // ignore: use_build_context_synchronously
+                                      courseName = newValue;
                                       courseId = Provider.of<CourseStore>(
                                               context,
                                               listen: false)
@@ -244,6 +252,56 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
                                   ),
                                 ),
                               ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            GestureDetector(
+                              onTap: courseId == null
+                                  ? null
+                                  : () {
+                                      FileDownloader.downloadFile(
+                                        url:
+                                            "http://134.122.64.234/api/v1/students-profiles/attendance_report_by_user_and_course/$courseId/",
+                                        onProgress: (fileName, progress) {
+                                          setState(() {
+                                            _progress = progress;
+                                          });
+                                        },
+                                        onDownloadCompleted: (pat) {
+                                          String dir = path.dirname(pat);
+                                          String newPath = path.join(dir,
+                                              '$courseName-${DateTime.now().day}_${DateTime.now().month}_${DateTime.now().year} ${DateTime.now().hour}:${DateTime.now().minute}.xlsx');
+
+                                          File file = File(pat);
+                                          file.rename(newPath);
+                                          setState(() {
+                                            _progress = null;
+                                          });
+                                        },
+                                      );
+                                    },
+                              child: _progress != null
+                                  ? const CircularProgressIndicator()
+                                  : Container(
+                                      width: getWidth(context) * .5,
+                                      height: getHeight(context) * .05,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          color: courseId == null
+                                              ? MyColors.myGrey
+                                              : MyColors.myLightPurple),
+                                      child: const Center(
+                                        child: Text(
+                                          'Download Excel',
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
                             )
                           ],
                         ),
@@ -409,4 +467,70 @@ class _DoctorReportsScreenState extends State<DoctorReportsScreen> {
       ),
     );
   }
+
+  // Future<File?> downloadFile() async {
+  //   var url =
+  //       'http://134.122.64.234/api/v1/students-profiles/attendance_report_by_user_and_course/$courseId/';
+  //   var response = await http.get(Uri.parse(url));
+  //   var bytes = response.bodyBytes;
+  //   var dir = await getApplicationDocumentsDirectory();
+  //   File file = File('${dir.path}/file.xlsx');
+
+  //   await file.writeAsBytes(bytes);
+  //   if (response.statusCode == 200) {
+  //     OpenFile.open(file.path);
+  //   }
+
+  //   print("Download completed.");
+  //   print("File path: ${file.path}");
+  //   return file;
+  // }
+
+  // Future<File?> downloadFile() async {
+  //   try {
+  //     var dir = await getApplicationDocumentsDirectory();
+  //     final file = File('${dir.path}/file.xlsx');
+
+  //     final reponse = await Dio().get(
+  //       "http://134.122.64.234/api/v1/students-profiles/attendance_report_by_user_and_course/c4f77f26-ecba-438c-9139-bd59931f06e6/",
+  //       options: Options(
+  //         responseType: ResponseType.bytes,
+  //         followRedirects: false,
+  //         validateStatus: (status) => true,
+  //         // receiveTimeout: 0,
+  //       ),
+  //     );
+  //     print(reponse.statusCode);
+  //     final raf = file.openSync(mode: FileMode.write);
+  //     raf.writeFromSync(reponse.data);
+  //     await raf.close();
+  //     print("Download completed.");
+  //     return file;
+  //   } catch (e) {
+  //     print(e);
+  //     return null;
+  //   }
+  // }
+
+  // Future<void> downloadFile() async {
+  //   Dio dio = Dio();
+
+  //   try {
+  //     var dir = await getApplicationDocumentsDirectory();
+
+  //     await dio.download(
+  //       "http://134.122.64.234/api/v1/students-profiles/attendance_report_by_user_and_course/c4f77f26-ecba-438c-9139-bd59931f06e6/",
+  //       "${dir.path}/file.xlsx",
+  //       onReceiveProgress: (rec, total) {
+  //         print("Rec: $rec , Total: $total");
+
+  //         // Update the progress
+  //       },
+  //     );
+  //     print("${dir.path}/file.xlsx");
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  //   print("Download completed.");
+  // }
 }

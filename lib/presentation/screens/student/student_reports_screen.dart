@@ -85,7 +85,7 @@ class _StudentReportsScreenState extends State<StudentReportsScreen> {
                       const Align(
                         alignment: Alignment.center,
                         child: Text(
-                          'Reports Card',
+                          'Reports',
                           style: TextStyle(
                               fontSize: 35, fontWeight: FontWeight.w700),
                         ),

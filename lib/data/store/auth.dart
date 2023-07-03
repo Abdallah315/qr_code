@@ -51,8 +51,6 @@ class Auth with ChangeNotifier {
             're_password': rePassword,
           }));
 
-      final responseData = json.decode(resposne.body);
-
       if (resposne.statusCode == 201) {
         Fluttertoast.showToast(
             msg: "Activation email has been sent",
